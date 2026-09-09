@@ -547,6 +547,14 @@
         <div id="bookmarks-list" class="flex-grow overflow-y-auto p-4 flex flex-col gap-2">
             <!-- JS Generated -->
         </div>
+
+        <!-- Export Section at the bottom -->
+        <div class="p-4 border-t border-neutral-800 flex justify-end items-center bg-black/40">
+            <button onclick="exportBookmarks()"
+                class="text-[10px] text-neutral-500 hover:text-[var(--theme-color)] flex items-center gap-1 transition-colors">
+                <i class="ph-download-simple"></i> Export Bookmarks to Browser HTML
+            </button>
+        </div>
     </div>
 
     <!-- Edit Modal (For Bulk Edit & Theme) -->
@@ -572,17 +580,6 @@
                         <span class="text-xs text-neutral-300">Open links in new tab</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="setting-open-new-tab" class="sr-only peer"
-                                onchange="updateLinkBehaviorSettings()">
-                            <div
-                                class="w-9 h-5 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--theme-color)] peer-checked:after:bg-black">
-                            </div>
-                        </label>
-                    </div>
-
-                    <div id="open-background-row" class="flex items-center justify-between">
-                        <span class="text-xs text-neutral-300">Open tab in background</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="setting-open-background" class="sr-only peer"
                                 onchange="updateLinkBehaviorSettings()">
                             <div
                                 class="w-9 h-5 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--theme-color)] peer-checked:after:bg-black">
@@ -704,7 +701,6 @@
 
         // Link Behavior Settings
         let openNewTab = JSON.parse(localStorage.getItem('dash_open_new_tab') ?? 'true');
-        let openInBackground = JSON.parse(localStorage.getItem('dash_open_background') ?? 'false');
 
         function openUrl(url) {
             if (!url) return;
@@ -721,13 +717,6 @@
             }
 
             if (win && !win.closed && typeof win.closed !== 'undefined') {
-                if (openInBackground) {
-                    try { win.blur(); } catch (e) { }
-                    window.focus();
-                    setTimeout(() => { window.focus(); }, 0);
-                    setTimeout(() => { window.focus(); }, 50);
-                    setTimeout(() => { window.focus(); }, 150);
-                }
                 return;
             }
 
@@ -747,20 +736,9 @@
 
         function updateLinkBehaviorSettings() {
             const newTabCb = document.getElementById('setting-open-new-tab');
-            const bgCb = document.getElementById('setting-open-background');
-            const bgRow = document.getElementById('open-background-row');
-
-            if (newTabCb && bgCb) {
+            if (newTabCb) {
                 openNewTab = newTabCb.checked;
-                openInBackground = bgCb.checked;
-
                 localStorage.setItem('dash_open_new_tab', JSON.stringify(openNewTab));
-                localStorage.setItem('dash_open_background', JSON.stringify(openInBackground));
-
-                if (bgRow) {
-                    bgRow.style.opacity = openNewTab ? '1' : '0.4';
-                    bgCb.disabled = !openNewTab;
-                }
 
                 renderLinks('social-list', socials, 'social');
                 renderLinks('chatbots-list', chatbots, 'chatbots');
@@ -1498,6 +1476,37 @@
             renderBookmarks();
         }
 
+        function exportBookmarks() {
+            if (!bookmarks || bookmarks.length === 0) {
+                alert("No bookmarks saved to export.");
+                return;
+            }
+
+            let htmlContent = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<!-- This is an automatically generated file.
+     It will read this file. Do Not Edit! -->
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>\n`;
+            bookmarks.forEach(bm => {
+                const title = (bm.title || 'Bookmark').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const url = (bm.url || '#').replace(/"/g, '&quot;');
+                htmlContent += `    <DT><A HREF="${url}">${title}</A>\n`;
+            });
+            htmlContent += `</DL><p>\n`;
+
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bookmarks.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
         const notesArea = document.getElementById('notes-area');
         notesArea.value = localStorage.getItem('dash_notes') || '';
         notesArea.addEventListener('input', (e) => {
@@ -1516,15 +1525,8 @@
 
                 // Initialize link behavior settings
                 const newTabCb = document.getElementById('setting-open-new-tab');
-                const bgCb = document.getElementById('setting-open-background');
-                const bgRow = document.getElementById('open-background-row');
-                if (newTabCb && bgCb) {
+                if (newTabCb) {
                     newTabCb.checked = openNewTab;
-                    bgCb.checked = openInBackground;
-                    if (bgRow) {
-                        bgRow.style.opacity = openNewTab ? '1' : '0.4';
-                        bgCb.disabled = !openNewTab;
-                    }
                 }
 
                 modal.classList.remove('hidden');
@@ -1830,7 +1832,7 @@
                 'dash_socials', 'dash_chatbots', 'dash_bottom_shortcuts',
                 'dash_bookmarks', 'dash_history', 'dash_calendar_data',
                 'dash_engine', 'dash_notes', 'dash_theme_color',
-                'dash_open_new_tab', 'dash_open_background'
+                'dash_open_new_tab'
             ];
             const data = {};
             keys.forEach(key => {
