@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Ownership & Author Data -->
     <meta name="author" content="https://github.com/Delta-R-git">
-    
+
     <title>Nexus</title>
-    
+
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/phosphor-icons"></script>
@@ -28,7 +29,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="background-color" content="#000000">
 
-    
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&display=swap');
 
@@ -47,15 +48,18 @@
         ::-webkit-scrollbar {
             width: 6px;
         }
+
         ::-webkit-scrollbar-track {
-            background: #000; 
+            background: #000;
         }
+
         ::-webkit-scrollbar-thumb {
-            background: #333; 
+            background: #333;
             border-radius: 3px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
-            background: #555; 
+            background: #555;
         }
 
         /* Animations */
@@ -63,10 +67,17 @@
             animation: fadeIn 0.8s ease-out forwards;
             opacity: 0;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Dropdown transition */
@@ -75,9 +86,10 @@
             opacity: 0;
             overflow: hidden;
             transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-in-out;
-            pointer-events: none; /* Prevent clicks when closed */
+            pointer-events: none;
+            /* Prevent clicks when closed */
         }
-        
+
         /* Show on Active class (Click), Group Hover, OR Focus Within */
         .dropdown-content.active,
         .group:hover .dropdown-content,
@@ -116,15 +128,26 @@
         #notes-drawer {
             transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        
+
         /* Mobile: Bottom Sheet */
-        .notes-mobile-hidden { transform: translateY(100%); }
-        .notes-mobile-shown { transform: translateY(0); }
+        .notes-mobile-hidden {
+            transform: translateY(100%);
+        }
+
+        .notes-mobile-shown {
+            transform: translateY(0);
+        }
 
         @media (min-width: 768px) {
+
             /* Desktop: Right Sidebar */
-            .notes-desktop-hidden { transform: translateX(100%); }
-            .notes-desktop-shown { transform: translateX(0); }
+            .notes-desktop-hidden {
+                transform: translateX(100%);
+            }
+
+            .notes-desktop-shown {
+                transform: translateX(0);
+            }
         }
 
         /* Context Menus */
@@ -137,7 +160,7 @@
         /* Tooltip for large calendar */
         .cal-tooltip {
             visibility: hidden;
-            background-color: rgba(0,0,0,0.9);
+            background-color: rgba(0, 0, 0, 0.9);
             color: var(--theme-color);
             text-align: center;
             border-radius: 4px;
@@ -165,7 +188,10 @@
         }
     </style>
 </head>
-<body class="h-screen flex flex-col justify-between p-4 md:p-6 relative selection:bg-[var(--theme-color)] selection:text-black" onclick="handleBodyClick(event)">
+
+<body
+    class="h-screen flex flex-col justify-between p-4 md:p-6 relative selection:bg-[var(--theme-color)] selection:text-black"
+    onclick="handleBodyClick(event)">
 
     <!-- Top Bar -->
     <header class="flex justify-between items-start fade-in" style="animation-delay: 0.1s;">
@@ -177,38 +203,52 @@
 
         <!-- Controls (Responsive Styling) -->
         <div class="flex gap-2 md:gap-4 text-neutral-400 -mt-2 -mr-2 md:mt-0 md:mr-0">
-            <button onclick="toggleEditMode()" class="hover:text-[var(--theme-color)] transition-colors p-1.5 md:p-2 hover:bg-neutral-900 rounded-full" title="Edit Shortcuts">
+            <button onclick="toggleEditMode()"
+                class="hover:text-[var(--theme-color)] transition-colors p-1.5 md:p-2 hover:bg-neutral-900 rounded-full"
+                title="Edit Shortcuts">
                 <i class="ph-pencil text-lg md:text-xl"></i>
             </button>
-            <button id="notes-toggle-btn" onclick="toggleNotes(event)" class="hover:text-[var(--theme-color)] transition-colors p-1.5 md:p-2 hover:bg-neutral-900 rounded-full" title="Notes">
+            <button id="notes-toggle-btn" onclick="toggleNotes(event)"
+                class="hover:text-[var(--theme-color)] transition-colors p-1.5 md:p-2 hover:bg-neutral-900 rounded-full"
+                title="Notes">
                 <i class="ph-notepad text-lg md:text-xl"></i>
             </button>
-            <button id="bookmarks-toggle-btn" onclick="toggleBookmarks(event)" class="hover:text-[var(--theme-color)] transition-colors p-1.5 md:p-2 hover:bg-neutral-900 rounded-full" title="Bookmarks">
+            <button id="bookmarks-toggle-btn" onclick="toggleBookmarks(event)"
+                class="hover:text-[var(--theme-color)] transition-colors p-1.5 md:p-2 hover:bg-neutral-900 rounded-full"
+                title="Bookmarks">
                 <i class="ph-bookmarks text-lg md:text-xl"></i>
             </button>
         </div>
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-grow flex flex-col justify-start pt-32 md:pt-0 md:justify-center items-center w-full max-w-2xl mx-auto z-10 fade-in" style="animation-delay: 0.3s;">
-        
+    <main
+        class="flex-grow flex flex-col justify-start pt-32 md:pt-0 md:justify-center items-center w-full max-w-2xl mx-auto z-10 fade-in"
+        style="animation-delay: 0.3s;">
+
         <!-- CONNECTION STATUS INDICATOR -->
         <!-- Added 'min-h-[32px]' to prevent layout shift, and z-50 to ensure visibility -->
-        <div id="connection-status" class="min-h-[32px] mb-4 flex justify-center items-center opacity-0 transition-opacity duration-700 ease-in-out z-50 relative">
+        <div id="connection-status"
+            class="min-h-[32px] mb-4 flex justify-center items-center opacity-0 transition-opacity duration-700 ease-in-out z-50 relative">
             <!-- Content injected by JS -->
         </div>
 
         <!-- Search Bar -->
         <div class="w-full mb-6 md:mb-12 relative z-50">
-            <div class="flex items-center bg-neutral-900/80 backdrop-blur-md border border-neutral-800 rounded-full px-4 py-3 shadow-2xl focus-within:border-neutral-600 transition-all duration-300 hover:border-neutral-700">
-                
+            <div
+                class="flex items-center bg-neutral-900/80 backdrop-blur-md border border-neutral-800 rounded-full px-4 py-3 shadow-2xl focus-within:border-neutral-600 transition-all duration-300 hover:border-neutral-700">
+
                 <!-- Engine Selector -->
-                <div class="relative group cursor-pointer mr-3 border-r border-neutral-800 pr-3" id="engine-selector-container">
-                    <div id="current-engine-icon" onclick="toggleEngineMenu(event)" tabindex="0" role="button" aria-label="Select Search Engine" class="text-neutral-400 hover:text-[var(--theme-color)] transition-colors flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/5 focus:outline-none">
+                <div class="relative group cursor-pointer mr-3 border-r border-neutral-800 pr-3"
+                    id="engine-selector-container">
+                    <div id="current-engine-icon" onclick="toggleEngineMenu(event)" tabindex="0" role="button"
+                        aria-label="Select Search Engine"
+                        class="text-neutral-400 hover:text-[var(--theme-color)] transition-colors flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/5 focus:outline-none">
                         <i class="ph-google-logo text-xl"></i>
                     </div>
                     <!-- Engine Dropdown -->
-                    <div id="engine-menu" class="absolute top-full left-0 mt-4 bg-neutral-900 border border-neutral-800 rounded-lg p-1 hidden group-hover:flex min-w-[180px] shadow-xl glass-panel flex-col gap-1 overflow-hidden z-50">
+                    <div id="engine-menu"
+                        class="absolute top-full left-0 mt-4 bg-neutral-900 border border-neutral-800 rounded-lg p-1 hidden group-hover:flex min-w-[180px] shadow-xl glass-panel flex-col gap-1 overflow-hidden z-50">
                         <!-- Options generated by JS -->
                     </div>
                 </div>
@@ -221,7 +261,8 @@
                 </form>
 
                 <!-- Search Icon -->
-                <button id="search-submit-btn" onclick="handleSearch(event)" aria-label="Submit Search" class="ml-2 text-neutral-500 hover:text-[var(--theme-color)] transition-colors p-1 rounded-full focus:outline-none">
+                <button id="search-submit-btn" type="button" onclick="handleSearch(event)" aria-label="Submit Search"
+                    class="ml-2 text-neutral-500 hover:text-[var(--theme-color)] transition-colors p-1 rounded-full focus:outline-none">
                     <i class="ph-magnifying-glass text-xl"></i>
                 </button>
             </div>
@@ -229,54 +270,74 @@
 
         <!-- Dropdown Menus Container -->
         <div class="w-full grid grid-cols-3 gap-2 md:gap-8 text-center mb-6 md:mb-0">
-            
+
             <!-- Social -->
             <div class="relative menu-container group">
-                <button onclick="toggleMenu('social', event)" class="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 w-full outline-none p-2 md:p-4 rounded-2xl bg-neutral-900/30 border border-transparent hover:border-neutral-800 hover:bg-neutral-900 transition-all duration-300 h-full">
-                    <i class="ph-share-network text-xl md:text-2xl text-neutral-500 group-hover:text-[var(--theme-color)] transition-colors"></i>
-                    <span class="uppercase text-[10px] md:text-xs tracking-wider md:tracking-[0.2em] text-neutral-500 group-hover:text-neutral-300 transition-colors">Social</span>
+                <button onclick="toggleMenu('social', event)"
+                    class="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 w-full outline-none p-2 md:p-4 rounded-2xl bg-neutral-900/30 border border-transparent hover:border-neutral-800 hover:bg-neutral-900 transition-all duration-300 h-full">
+                    <i
+                        class="ph-share-network text-xl md:text-2xl text-neutral-500 group-hover:text-[var(--theme-color)] transition-colors"></i>
+                    <span
+                        class="uppercase text-[10px] md:text-xs tracking-wider md:tracking-[0.2em] text-neutral-500 group-hover:text-neutral-300 transition-colors">Social</span>
                 </button>
-                <div id="social-dropdown" class="dropdown-content fixed md:absolute left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 top-1/2 md:top-full -translate-y-1/2 md:translate-y-0 md:w-64 pt-2 z-50 md:z-20">
+                <div id="social-dropdown"
+                    class="dropdown-content fixed md:absolute left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 top-1/2 md:top-full -translate-y-1/2 md:translate-y-0 md:w-64 pt-2 z-50 md:z-20">
                     <div class="glass-panel rounded-xl p-3 flex flex-col gap-2 shadow-2xl bg-black/90" id="social-list">
                         <!-- Links injected by JS -->
                     </div>
                     <!-- Plus Button -->
                     <div class="glass-panel border-t-0 rounded-b-xl rounded-t-none p-1 bg-neutral-900/80">
-                        <button onclick="openInputModal('add', 'social')" class="w-full text-neutral-500 hover:text-[var(--theme-color)] transition-colors text-xs py-1"><i class="ph-plus"></i></button>
+                        <button onclick="openInputModal('add', 'social')"
+                            class="w-full text-neutral-500 hover:text-[var(--theme-color)] transition-colors text-xs py-1"><i
+                                class="ph-plus"></i></button>
                     </div>
                 </div>
             </div>
 
             <!-- Chatbots -->
             <div class="relative menu-container group">
-                <button onclick="toggleMenu('chatbots', event)" class="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 w-full outline-none p-2 md:p-4 rounded-2xl bg-neutral-900/30 border border-transparent hover:border-neutral-800 hover:bg-neutral-900 transition-all duration-300 h-full">
-                    <i class="ph-magic-wand text-xl md:text-2xl text-neutral-500 group-hover:text-[var(--theme-color)] transition-colors"></i>
-                    <span class="uppercase text-[10px] md:text-xs tracking-wider md:tracking-[0.2em] text-neutral-500 group-hover:text-neutral-300 transition-colors">AI Chat</span>
+                <button onclick="toggleMenu('chatbots', event)"
+                    class="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 w-full outline-none p-2 md:p-4 rounded-2xl bg-neutral-900/30 border border-transparent hover:border-neutral-800 hover:bg-neutral-900 transition-all duration-300 h-full">
+                    <i
+                        class="ph-magic-wand text-xl md:text-2xl text-neutral-500 group-hover:text-[var(--theme-color)] transition-colors"></i>
+                    <span
+                        class="uppercase text-[10px] md:text-xs tracking-wider md:tracking-[0.2em] text-neutral-500 group-hover:text-neutral-300 transition-colors">AI
+                        Chat</span>
                 </button>
-                <div id="chatbots-dropdown" class="dropdown-content fixed md:absolute left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 top-1/2 md:top-full -translate-y-1/2 md:translate-y-0 md:w-64 pt-2 z-50 md:z-20">
-                    <div class="glass-panel rounded-xl p-3 flex flex-col gap-2 shadow-2xl bg-black/90" id="chatbots-list">
-                         <!-- Links injected by JS -->
+                <div id="chatbots-dropdown"
+                    class="dropdown-content fixed md:absolute left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 top-1/2 md:top-full -translate-y-1/2 md:translate-y-0 md:w-64 pt-2 z-50 md:z-20">
+                    <div class="glass-panel rounded-xl p-3 flex flex-col gap-2 shadow-2xl bg-black/90"
+                        id="chatbots-list">
+                        <!-- Links injected by JS -->
                     </div>
                     <!-- Plus Button -->
                     <div class="glass-panel border-t-0 rounded-b-xl rounded-t-none p-1 bg-neutral-900/80">
-                        <button onclick="openInputModal('add', 'chatbots')" class="w-full text-neutral-500 hover:text-[var(--theme-color)] transition-colors text-xs py-1"><i class="ph-plus"></i></button>
-                   </div>
+                        <button onclick="openInputModal('add', 'chatbots')"
+                            class="w-full text-neutral-500 hover:text-[var(--theme-color)] transition-colors text-xs py-1"><i
+                                class="ph-plus"></i></button>
+                    </div>
                 </div>
             </div>
 
             <!-- History -->
             <div class="relative menu-container group">
-                <button onclick="toggleMenu('history', event)" class="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 w-full outline-none p-2 md:p-4 rounded-2xl bg-neutral-900/30 border border-transparent hover:border-neutral-800 hover:bg-neutral-900 transition-all duration-300 h-full">
-                    <i class="ph-clock-counter-clockwise text-xl md:text-2xl text-neutral-500 group-hover:text-[var(--theme-color)] transition-colors"></i>
-                    <span class="uppercase text-[10px] md:text-xs tracking-wider md:tracking-[0.2em] text-neutral-500 group-hover:text-neutral-300 transition-colors">Recent</span>
+                <button onclick="toggleMenu('history', event)"
+                    class="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 w-full outline-none p-2 md:p-4 rounded-2xl bg-neutral-900/30 border border-transparent hover:border-neutral-800 hover:bg-neutral-900 transition-all duration-300 h-full">
+                    <i
+                        class="ph-clock-counter-clockwise text-xl md:text-2xl text-neutral-500 group-hover:text-[var(--theme-color)] transition-colors"></i>
+                    <span
+                        class="uppercase text-[10px] md:text-xs tracking-wider md:tracking-[0.2em] text-neutral-500 group-hover:text-neutral-300 transition-colors">Recent</span>
                 </button>
-                <div id="history-dropdown" class="dropdown-content fixed md:absolute left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 top-1/2 md:top-full -translate-y-1/2 md:translate-y-0 md:w-64 pt-2 z-50 md:z-20">
+                <div id="history-dropdown"
+                    class="dropdown-content fixed md:absolute left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 top-1/2 md:top-full -translate-y-1/2 md:translate-y-0 md:w-64 pt-2 z-50 md:z-20">
                     <div class="glass-panel rounded-xl p-3 flex flex-col gap-2 shadow-2xl bg-black/90 text-left">
                         <div id="history-list" class="flex flex-col gap-1">
                             <span class="text-xs text-neutral-600 italic text-center py-2">No recent searches</span>
                         </div>
                         <div class="border-t border-neutral-800 mt-2 pt-2">
-                            <button onclick="clearHistory()" class="text-[10px] uppercase tracking-wider text-red-900 hover:text-red-500 text-center w-full transition-colors py-1">Clear History</button>
+                            <button onclick="clearHistory()"
+                                class="text-[10px] uppercase tracking-wider text-red-900 hover:text-red-500 text-center w-full transition-colors py-1">Clear
+                                History</button>
                         </div>
                     </div>
                 </div>
@@ -286,20 +347,25 @@
 
         <!-- Shortcuts (Mobile Only - In Main Flow) -->
         <div class="w-full md:hidden flex flex-col items-center mt-6">
-             <div class="shortcuts-grid-container w-full flex flex-wrap justify-center gap-3 px-1">
-                 <!-- JS Generated -->
+            <div class="shortcuts-grid-container w-full flex flex-wrap justify-center gap-3 px-1">
+                <!-- JS Generated -->
             </div>
         </div>
 
     </main>
 
     <!-- Bottom Widgets -->
-    <footer class="flex flex-col md:flex-row justify-between items-end gap-4 h-56 fade-in relative px-2 md:px-0" style="animation-delay: 0.5s;">
-        
+    <footer class="flex flex-col md:flex-row justify-between items-end gap-4 h-56 fade-in relative px-2 md:px-0"
+        style="animation-delay: 0.5s;">
+
         <!-- 1. Calendar Widget (Left) -->
-        <div id="calendar-widget-btn" tabindex="0" role="button" aria-label="Expand Calendar" class="w-full md:w-64 h-full flex flex-col justify-end cursor-pointer group flex-shrink-0" onclick="expandCalendar()">
-            <div class="glass-panel p-4 rounded-xl border border-neutral-900/50 group-hover:border-neutral-700 transition-colors relative h-full flex flex-col justify-between">
-                <div class="absolute top-2 right-2 text-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div id="calendar-widget-btn" tabindex="0" role="button" aria-label="Expand Calendar"
+            class="w-full md:w-64 h-full flex flex-col justify-end cursor-pointer group flex-shrink-0"
+            onclick="expandCalendar()">
+            <div
+                class="glass-panel p-4 rounded-xl border border-neutral-900/50 group-hover:border-neutral-700 transition-colors relative h-full flex flex-col justify-between">
+                <div
+                    class="absolute top-2 right-2 text-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity">
                     <i class="ph-arrows-out-simple"></i>
                 </div>
                 <div class="flex justify-between items-baseline mb-2">
@@ -322,12 +388,16 @@
         </div>
 
         <!-- 3. Visualizer Widget (Right) WITH OWNERSHIP LINK -->
-        <div class="w-full md:w-64 h-full relative overflow-hidden rounded-xl glass-panel border border-neutral-900/50 flex-shrink-0">
+        <div
+            class="w-full md:w-64 h-full relative overflow-hidden rounded-xl glass-panel border border-neutral-900/50 flex-shrink-0">
             <canvas id="networkCanvas" class="absolute top-0 left-0 w-full h-full opacity-60"></canvas>
             <div class="absolute bottom-4 right-4 z-20 pointer-events-auto">
-                <p id="system-status-text" class="text-[10px] text-neutral-600 tracking-widest uppercase transition-colors duration-300">System Online</p>
+                <p id="system-status-text"
+                    class="text-[10px] text-neutral-600 tracking-widest uppercase transition-colors duration-300">System
+                    Online</p>
                 <!-- GitHub / Owner Link -->
-                <a href="https://github.com/Delta-R-git/StartPage-Nexus" target="_blank" tabindex="-1" class="text-[10px] text-neutral-700 hover:text-[var(--theme-color)] tracking-widest uppercase text-right transition-colors block mt-1 font-semibold">
+                <a href="https://github.com/Delta-R-git/StartPage-Nexus" target="_blank" tabindex="-1"
+                    class="text-[10px] text-neutral-700 hover:text-[var(--theme-color)] tracking-widest uppercase text-right transition-colors block mt-1 font-semibold">
                     Delta_R_git
                 </a>
             </div>
@@ -336,65 +406,89 @@
     </footer>
 
     <!-- Expanded Calendar Modal -->
-    <div id="calendar-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[70] hidden flex justify-center items-center p-8" onclick="closeCalendar(event)">
-        <div class="glass-panel p-4 md:p-8 rounded-2xl w-full max-w-2xl shadow-2xl relative" onclick="event.stopPropagation()">
+    <div id="calendar-modal"
+        class="fixed inset-0 bg-black/90 backdrop-blur-md z-[70] hidden flex justify-center items-center p-8"
+        onclick="closeCalendar(event)">
+        <div class="glass-panel p-4 md:p-8 rounded-2xl w-full max-w-2xl shadow-2xl relative"
+            onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6">
-                <button onclick="changeMonth(-1)" class="text-neutral-500 hover:text-[var(--theme-color)] p-2"><i class="ph-caret-left text-2xl"></i></button>
+                <button onclick="changeMonth(-1)" class="text-neutral-500 hover:text-[var(--theme-color)] p-2"><i
+                        class="ph-caret-left text-2xl"></i></button>
                 <div class="text-center">
                     <span id="cal-month-lg" class="text-3xl font-light text-[var(--theme-color)]">Month</span>
                     <span id="cal-year-lg" class="text-xl text-neutral-500 ml-2">Year</span>
                 </div>
-                <button onclick="changeMonth(1)" class="text-neutral-500 hover:text-[var(--theme-color)] p-2"><i class="ph-caret-right text-2xl"></i></button>
+                <button onclick="changeMonth(1)" class="text-neutral-500 hover:text-[var(--theme-color)] p-2"><i
+                        class="ph-caret-right text-2xl"></i></button>
             </div>
             <div id="calendar-grid-lg" class="grid grid-cols-7 gap-2 md:gap-4 text-center text-neutral-400">
                 <!-- JS Generated -->
             </div>
-            <p class="text-[10px] text-neutral-600 mt-4 text-center uppercase tracking-widest">Right-click a date to customize</p>
+            <p class="text-[10px] text-neutral-600 mt-4 text-center uppercase tracking-widest">Right-click a date to
+                customize</p>
         </div>
     </div>
 
     <!-- Calendar Context Menu -->
-    <div id="calendar-context-menu" class="context-menu glass-panel bg-neutral-900 border border-neutral-700 rounded-lg p-3 w-48 shadow-xl hidden flex-col gap-2">
-        <p class="text-xs text-neutral-500 uppercase tracking-widest mb-1 border-b border-neutral-800 pb-1">Edit Date</p>
+    <div id="calendar-context-menu"
+        class="context-menu glass-panel bg-neutral-900 border border-neutral-700 rounded-lg p-3 w-48 shadow-xl hidden flex-col gap-2">
+        <p class="text-xs text-neutral-500 uppercase tracking-widest mb-1 border-b border-neutral-800 pb-1">Edit Date
+        </p>
         <div class="flex items-center gap-2">
             <label class="text-xs text-neutral-300 w-10">Color</label>
             <input type="color" id="ctx-color" class="bg-transparent border-none w-8 h-6 cursor-pointer">
         </div>
         <div class="flex flex-col gap-1">
             <label class="text-xs text-neutral-300">Note</label>
-            <input type="text" id="ctx-note" class="bg-neutral-800 border border-neutral-700 rounded text-xs text-white px-2 py-1 focus:outline-none focus:border-neutral-500">
+            <input type="text" id="ctx-note"
+                class="bg-neutral-800 border border-neutral-700 rounded text-xs text-white px-2 py-1 focus:outline-none focus:border-neutral-500">
         </div>
         <div class="flex justify-between mt-2">
-            <button onclick="clearDateData()" class="text-xs text-red-500 hover:text-red-400 px-2 py-1 hover:bg-neutral-800 rounded">Clear</button>
-            <button onclick="saveDateData()" class="bg-[var(--theme-color)] text-black text-xs font-bold px-3 py-1 rounded hover:opacity-90">Save</button>
+            <button onclick="clearDateData()"
+                class="text-xs text-red-500 hover:text-red-400 px-2 py-1 hover:bg-neutral-800 rounded">Clear</button>
+            <button onclick="saveDateData()"
+                class="bg-[var(--theme-color)] text-black text-xs font-bold px-3 py-1 rounded hover:opacity-90">Save</button>
         </div>
     </div>
 
     <!-- Link Context Menu -->
-    <div id="link-context-menu" class="context-menu glass-panel bg-neutral-900 border border-neutral-700 rounded-lg p-2 w-32 shadow-xl hidden flex-col gap-1">
-        <button onclick="editLink()" class="text-left text-xs text-neutral-300 hover:text-[var(--theme-color)] hover:bg-neutral-800 p-2 rounded transition-colors flex items-center gap-2"><i class="ph-pencil-simple"></i> Edit</button>
-        <button onclick="deleteLink()" class="text-left text-xs text-red-400 hover:text-red-300 hover:bg-neutral-800 p-2 rounded transition-colors flex items-center gap-2"><i class="ph-trash"></i> Delete</button>
+    <div id="link-context-menu"
+        class="context-menu glass-panel bg-neutral-900 border border-neutral-700 rounded-lg p-2 w-32 shadow-xl hidden flex-col gap-1">
+        <button onclick="editLink()"
+            class="text-left text-xs text-neutral-300 hover:text-[var(--theme-color)] hover:bg-neutral-800 p-2 rounded transition-colors flex items-center gap-2"><i
+                class="ph-pencil-simple"></i> Edit</button>
+        <button onclick="deleteLink()"
+            class="text-left text-xs text-red-400 hover:text-red-300 hover:bg-neutral-800 p-2 rounded transition-colors flex items-center gap-2"><i
+                class="ph-trash"></i> Delete</button>
     </div>
 
     <!-- General Input Modal -->
-    <div id="input-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[80] hidden flex justify-center items-center p-4">
+    <div id="input-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[80] hidden flex justify-center items-center p-4">
         <div class="glass-panel bg-neutral-900/90 rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-neutral-800">
-            <h3 id="modal-title" class="text-sm font-light text-[var(--theme-color)] mb-4 uppercase tracking-wider">Edit Link</h3>
-            
+            <h3 id="modal-title" class="text-sm font-light text-[var(--theme-color)] mb-4 uppercase tracking-wider">Edit
+                Link</h3>
+
             <div class="space-y-3">
                 <div>
                     <label class="text-[10px] text-neutral-500 uppercase">Website URL</label>
-                    <input type="text" id="modal-url" class="w-full bg-black border border-neutral-700 rounded p-2 text-xs text-white focus:outline-none focus:border-[var(--theme-color)] mt-1" placeholder="https://...">
+                    <input type="text" id="modal-url"
+                        class="w-full bg-black border border-neutral-700 rounded p-2 text-xs text-white focus:outline-none focus:border-[var(--theme-color)] mt-1"
+                        placeholder="https://...">
                 </div>
                 <div>
                     <label class="text-[10px] text-neutral-500 uppercase">Name (Optional)</label>
-                    <input type="text" id="modal-name" class="w-full bg-black border border-neutral-700 rounded p-2 text-xs text-white focus:outline-none focus:border-[var(--theme-color)] mt-1" placeholder="e.g. Google">
+                    <input type="text" id="modal-name"
+                        class="w-full bg-black border border-neutral-700 rounded p-2 text-xs text-white focus:outline-none focus:border-[var(--theme-color)] mt-1"
+                        placeholder="e.g. Google">
                 </div>
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
-                <button onclick="closeInputModalWrapper()" class="text-xs text-neutral-500 hover:text-white px-3 py-2">Cancel</button>
-                <button onclick="saveInputData()" class="bg-[var(--theme-color)] text-black px-4 py-2 rounded text-xs font-bold hover:opacity-90 transition-colors">Save</button>
+                <button onclick="closeInputModalWrapper()"
+                    class="text-xs text-neutral-500 hover:text-white px-3 py-2">Cancel</button>
+                <button onclick="saveInputData()"
+                    class="bg-[var(--theme-color)] text-black px-4 py-2 rounded text-xs font-bold hover:opacity-90 transition-colors">Save</button>
             </div>
         </div>
     </div>
@@ -409,30 +503,44 @@
             <h2 class="text-sm font-light tracking-widest uppercase flex items-center gap-2">
                 <i class="ph-notepad text-lg"></i> Quick Notes
             </h2>
-            <button onclick="closeNotes()" class="text-neutral-500 hover:text-[var(--theme-color)] p-2 rounded-full hover:bg-neutral-800"><i class="ph-x text-xl"></i></button>
+            <button onclick="closeNotes()"
+                class="text-neutral-500 hover:text-[var(--theme-color)] p-2 rounded-full hover:bg-neutral-800"><i
+                    class="ph-x text-xl"></i></button>
         </div>
-        <textarea id="notes-area" class="flex-grow bg-transparent p-8 text-neutral-300 font-mono text-sm resize-none focus:outline-none leading-relaxed" placeholder="Type your thoughts here..."></textarea>
+        <textarea id="notes-area"
+            class="flex-grow bg-transparent p-8 text-neutral-300 font-mono text-sm resize-none focus:outline-none leading-relaxed"
+            placeholder="Type your thoughts here..."></textarea>
     </div>
 
     <!-- Bookmarks Drawer -->
-    <div id="bookmarks-drawer" class="fixed top-0 right-0 w-full md:w-80 h-full glass-panel bg-black/95 transform translate-x-full transition-transform duration-500 ease-in-out z-50 flex flex-col border-l border-neutral-800 shadow-2xl">
+    <div id="bookmarks-drawer"
+        class="fixed top-0 right-0 w-full md:w-80 h-full glass-panel bg-black/95 transform translate-x-full transition-transform duration-500 ease-in-out z-50 flex flex-col border-l border-neutral-800 shadow-2xl">
         <div class="flex justify-between items-center p-6 border-b border-neutral-800">
             <h2 class="text-sm font-light tracking-widest uppercase flex items-center gap-2">
                 <i class="ph-bookmarks text-lg"></i> Bookmarks
             </h2>
-            <button onclick="closeBookmarks()" class="text-neutral-500 hover:text-[var(--theme-color)] p-2 rounded-full hover:bg-neutral-800"><i class="ph-x text-xl"></i></button>
+            <button onclick="closeBookmarks()"
+                class="text-neutral-500 hover:text-[var(--theme-color)] p-2 rounded-full hover:bg-neutral-800"><i
+                    class="ph-x text-xl"></i></button>
         </div>
-        
+
         <!-- Add Bookmark Input Section -->
         <div class="p-4 flex flex-col gap-2 border-b border-neutral-800">
             <div class="flex gap-2">
-                <input type="text" id="bm-title" placeholder="Name" class="w-1/3 bg-neutral-900 border border-neutral-800 rounded px-2 py-2 text-xs text-white focus:outline-none focus:border-[var(--theme-color)]">
-                <input type="text" id="bm-url" placeholder="URL" class="w-2/3 bg-neutral-900 border border-neutral-800 rounded px-2 py-2 text-xs text-white focus:outline-none focus:border-[var(--theme-color)]">
-                <button onclick="addBookmark()" class="bg-[var(--theme-color)] text-black rounded px-3 text-xs font-bold hover:opacity-90 flex-shrink-0"><i class="ph-plus"></i></button>
+                <input type="text" id="bm-title" placeholder="Name"
+                    class="w-1/3 bg-neutral-900 border border-neutral-800 rounded px-2 py-2 text-xs text-white focus:outline-none focus:border-[var(--theme-color)]">
+                <input type="text" id="bm-url" placeholder="URL"
+                    class="w-2/3 bg-neutral-900 border border-neutral-800 rounded px-2 py-2 text-xs text-white focus:outline-none focus:border-[var(--theme-color)]">
+                <button onclick="addBookmark()"
+                    class="bg-[var(--theme-color)] text-black rounded px-3 text-xs font-bold hover:opacity-90 flex-shrink-0"><i
+                        class="ph-plus"></i></button>
             </div>
             <div class="flex justify-end">
-                 <button onclick="triggerBookmarkImport()" class="text-[10px] text-neutral-500 hover:text-[var(--theme-color)] flex items-center gap-1 transition-colors"><i class="ph-upload-simple"></i> Import from Browser HTML</button>
-                 <input type="file" id="bookmark-import-file" class="hidden" accept=".html" onchange="handleBookmarkImport(this)">
+                <button onclick="triggerBookmarkImport()"
+                    class="text-[10px] text-neutral-500 hover:text-[var(--theme-color)] flex items-center gap-1 transition-colors"><i
+                        class="ph-upload-simple"></i> Import from Browser HTML</button>
+                <input type="file" id="bookmark-import-file" class="hidden" accept=".html"
+                    onchange="handleBookmarkImport(this)">
             </div>
         </div>
 
@@ -442,33 +550,43 @@
     </div>
 
     <!-- Edit Modal (For Bulk Edit & Theme) -->
-    <div id="edit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex justify-center items-center p-4">
-        <div class="glass-panel bg-neutral-900/90 rounded-2xl p-4 md:p-6 w-[90vw] md:w-full max-w-lg shadow-2xl border border-neutral-800">
-            
+    <div id="edit-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex justify-center items-center p-4">
+        <div
+            class="glass-panel bg-neutral-900/90 rounded-2xl p-4 md:p-6 w-[90vw] md:w-full max-w-lg shadow-2xl border border-neutral-800">
+
             <div class="flex justify-between items-center mb-6 border-b border-neutral-800 pb-4">
-                <h3 class="text-lg font-light text-[var(--theme-color)] flex items-center gap-2"><i class="ph-pencil-simple"></i> Customize</h3>
-                <button onclick="closeEditMode()" class="text-neutral-500 hover:text-[var(--theme-color)]"><i class="ph-x text-xl"></i></button>
+                <h3 class="text-lg font-light text-[var(--theme-color)] flex items-center gap-2"><i
+                        class="ph-pencil-simple"></i> Customize</h3>
+                <button onclick="closeEditMode()" class="text-neutral-500 hover:text-[var(--theme-color)]"><i
+                        class="ph-x text-xl"></i></button>
             </div>
-            
+
             <div class="space-y-6 max-h-[60vh] overflow-y-auto pr-2 custom-scroll">
-                
+
                 <!-- Link & Search Behavior Section -->
                 <div class="mb-4 pb-4 border-b border-neutral-800 flex flex-col gap-3">
                     <h4 class="text-xs uppercase text-neutral-500 tracking-wider">Link & Search Behavior</h4>
-                    
+
                     <div class="flex items-center justify-between">
                         <span class="text-xs text-neutral-300">Open links in new tab</span>
                         <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="setting-open-new-tab" class="sr-only peer" onchange="updateLinkBehaviorSettings()">
-                            <div class="w-9 h-5 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--theme-color)] peer-checked:after:bg-black"></div>
+                            <input type="checkbox" id="setting-open-new-tab" class="sr-only peer"
+                                onchange="updateLinkBehaviorSettings()">
+                            <div
+                                class="w-9 h-5 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--theme-color)] peer-checked:after:bg-black">
+                            </div>
                         </label>
                     </div>
 
                     <div id="open-background-row" class="flex items-center justify-between">
                         <span class="text-xs text-neutral-300">Open tab in background</span>
                         <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="setting-open-background" class="sr-only peer" onchange="updateLinkBehaviorSettings()">
-                            <div class="w-9 h-5 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--theme-color)] peer-checked:after:bg-black"></div>
+                            <input type="checkbox" id="setting-open-background" class="sr-only peer"
+                                onchange="updateLinkBehaviorSettings()">
+                            <div
+                                class="w-9 h-5 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--theme-color)] peer-checked:after:bg-black">
+                            </div>
                         </label>
                     </div>
                 </div>
@@ -476,18 +594,25 @@
                 <!-- Theme & Data Section -->
                 <div class="mb-4 pb-4 border-b border-neutral-800 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
-                         <h4 class="text-xs uppercase text-neutral-500 tracking-wider">Theme & Data</h4>
+                        <h4 class="text-xs uppercase text-neutral-500 tracking-wider">Theme & Data</h4>
                     </div>
                     <div class="flex items-center gap-2">
-                        <input type="color" id="theme-color-picker" class="w-10 h-8 bg-transparent border border-neutral-700 rounded cursor-pointer p-0.5" oninput="previewTheme(this.value)" title="Change Theme Color">
-                        <button onclick="resetTheme()" class="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wider border border-red-900/50 px-2 py-1.5 rounded hover:bg-red-900/20 transition-colors">Reset</button>
-                        
+                        <input type="color" id="theme-color-picker"
+                            class="w-10 h-8 bg-transparent border border-neutral-700 rounded cursor-pointer p-0.5"
+                            oninput="previewTheme(this.value)" title="Change Theme Color">
+                        <button onclick="resetTheme()"
+                            class="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wider border border-red-900/50 px-2 py-1.5 rounded hover:bg-red-900/20 transition-colors">Reset</button>
+
                         <div class="flex-grow"></div>
                         <h4 class="text-xs uppercase text-neutral-500 tracking-wider">Data</h4>
-                        <button onclick="exportData()" class="text-neutral-400 hover:text-[var(--theme-color)] transition-colors p-2 rounded bg-neutral-800 border border-neutral-700" title="Export Config">
+                        <button onclick="exportData()"
+                            class="text-neutral-400 hover:text-[var(--theme-color)] transition-colors p-2 rounded bg-neutral-800 border border-neutral-700"
+                            title="Export Config">
                             <i class="ph-upload-simple text-lg"></i> Export
                         </button>
-                        <button onclick="triggerImport()" class="text-neutral-400 hover:text-[var(--theme-color)] transition-colors p-2 rounded bg-neutral-800 border border-neutral-700" title="Import Config">
+                        <button onclick="triggerImport()"
+                            class="text-neutral-400 hover:text-[var(--theme-color)] transition-colors p-2 rounded bg-neutral-800 border border-neutral-700"
+                            title="Import Config">
                             <i class="ph-download-simple text-lg"></i> Import
                         </button>
                         <input type="file" id="import-file" class="hidden" accept=".json" onchange="handleImport(this)">
@@ -498,26 +623,36 @@
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="text-xs uppercase text-neutral-500 tracking-wider">Social Links (JSON)</h4>
                         <div class="flex items-center gap-2">
-                            <button onclick="resetSection('social')" class="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wider border border-red-900/50 px-2 py-1 rounded hover:bg-red-900/20 transition-colors">Reset</button>
-                            <span class="text-[10px] text-neutral-600">Icon names from <a href="https://phosphoricons.com/" target="_blank" class="text-[10px] text-[var(--theme-color)] hover:text-neutral-300 transition-colors">Phosphor</a></span>
+                            <button onclick="resetSection('social')"
+                                class="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wider border border-red-900/50 px-2 py-1 rounded hover:bg-red-900/20 transition-colors">Reset</button>
+                            <span class="text-[10px] text-neutral-600">Icon names from <a
+                                    href="https://phosphoricons.com/" target="_blank"
+                                    class="text-[10px] text-[var(--theme-color)] hover:text-neutral-300 transition-colors">Phosphor</a></span>
                         </div>
                     </div>
-                    <textarea id="edit-social" class="w-full h-32 bg-black border border-neutral-800 rounded-lg p-4 text-xs font-mono text-green-500 focus:outline-none focus:border-[var(--theme-color)] leading-relaxed whitespace-pre-wrap break-all"></textarea>
+                    <textarea id="edit-social"
+                        class="w-full h-32 bg-black border border-neutral-800 rounded-lg p-4 text-xs font-mono text-green-500 focus:outline-none focus:border-[var(--theme-color)] leading-relaxed whitespace-pre-wrap break-all"></textarea>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="text-xs uppercase text-neutral-500 tracking-wider">Chatbot Links (JSON)</h4>
-                        <div class="flex items-center gap-2"> 
-                            <button onclick="resetSection('chatbots')" class="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wider border border-red-900/50 px-2 py-1 rounded hover:bg-red-900/20 transition-colors">Reset</button>
-                            <span class="text-[10px] text-neutral-600">Icon names from <a href="https://phosphoricons.com/" target="_blank" class="text-[10px] text-[var(--theme-color)] hover:text-neutral-300 transition-colors">Phosphor</a></span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="resetSection('chatbots')"
+                                class="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wider border border-red-900/50 px-2 py-1 rounded hover:bg-red-900/20 transition-colors">Reset</button>
+                            <span class="text-[10px] text-neutral-600">Icon names from <a
+                                    href="https://phosphoricons.com/" target="_blank"
+                                    class="text-[10px] text-[var(--theme-color)] hover:text-neutral-300 transition-colors">Phosphor</a></span>
                         </div>
                     </div>
-                    <textarea id="edit-chatbots" class="w-full h-32 bg-black border border-neutral-800 rounded-lg p-4 text-xs font-mono text-green-500 focus:outline-none focus:border-[var(--theme-color)] leading-relaxed whitespace-pre-wrap break-all"></textarea>
+                    <textarea id="edit-chatbots"
+                        class="w-full h-32 bg-black border border-neutral-800 rounded-lg p-4 text-xs font-mono text-green-500 focus:outline-none focus:border-[var(--theme-color)] leading-relaxed whitespace-pre-wrap break-all"></textarea>
                 </div>
             </div>
 
             <div class="mt-8 flex justify-end gap-3 pt-4 border-t border-neutral-800">
-                <button onclick="saveConfig()" class="bg-[var(--theme-color)] text-black px-6 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-colors shadow-lg shadow-[var(--theme-color)]/20">Save Changes</button>
+                <button onclick="saveConfig()"
+                    class="bg-[var(--theme-color)] text-black px-6 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-colors shadow-lg shadow-[var(--theme-color)]/20">Save
+                    Changes</button>
             </div>
         </div>
     </div>
@@ -566,7 +701,7 @@
         let searchHistory = JSON.parse(localStorage.getItem('dash_history')) || [];
         let calendarData = JSON.parse(localStorage.getItem('dash_calendar_data')) || {};
         let currentEngine = localStorage.getItem('dash_engine') || 'google';
-        
+
         // Link Behavior Settings
         let openNewTab = JSON.parse(localStorage.getItem('dash_open_new_tab') ?? 'true');
         let openInBackground = JSON.parse(localStorage.getItem('dash_open_background') ?? 'false');
@@ -578,9 +713,20 @@
                 return;
             }
 
-            const win = window.open(url, '_blank', 'noopener');
+            let win = null;
+            try {
+                win = window.open(url, '_blank');
+            } catch (e) {
+                win = null;
+            }
+
+            if (!win || win.closed || typeof win.closed === 'undefined') {
+                window.location.href = url;
+                return;
+            }
+
             if (openInBackground && win) {
-                try { win.blur(); } catch (e) {}
+                try { win.blur(); } catch (e) { }
                 window.focus();
                 setTimeout(() => { window.focus(); }, 0);
                 setTimeout(() => { window.focus(); }, 50);
@@ -630,7 +776,7 @@
         let currentLinkType = null;
         let currentLinkIndex = null;
         let dragSrcIndex = null; // Global for drag and drop
-        
+
         let displayDate = new Date(); // State for large calendar
 
         // Input Modal State
@@ -639,30 +785,30 @@
             type: null, // 'social', 'chatbots', 'shortcuts'
             index: null
         };
-        
+
         // --- Theme Logic ---
         function previewTheme(color) {
             document.documentElement.style.setProperty('--theme-color', color);
             themeRgb = hexToRgb(color);
         }
-        
+
         function resetTheme() {
-             const defaultColor = '#ffffff';
-             document.getElementById('theme-color-picker').value = defaultColor;
-             previewTheme(defaultColor);
+            const defaultColor = '#ffffff';
+            document.getElementById('theme-color-picker').value = defaultColor;
+            previewTheme(defaultColor);
         }
 
         // --- History API Handler ---
         window.addEventListener('popstate', (event) => {
-            closeAllUI(false); 
+            closeAllUI(false);
         });
 
         function closeAllUI(goBack = true) {
             // Revert theme if not saved
-            if(localStorage.getItem('dash_theme_color') !== getComputedStyle(document.documentElement).getPropertyValue('--theme-color').trim()) {
-                 const saved = localStorage.getItem('dash_theme_color') || '#ffffff';
-                 document.documentElement.style.setProperty('--theme-color', saved);
-                 themeRgb = hexToRgb(saved);
+            if (localStorage.getItem('dash_theme_color') !== getComputedStyle(document.documentElement).getPropertyValue('--theme-color').trim()) {
+                const saved = localStorage.getItem('dash_theme_color') || '#ffffff';
+                document.documentElement.style.setProperty('--theme-color', saved);
+                themeRgb = hexToRgb(saved);
             }
 
             const notesDrawer = document.getElementById('notes-drawer');
@@ -719,11 +865,11 @@
 
             const notesDrawer = document.getElementById('notes-drawer');
             const notesBtn = e.target.closest('#notes-toggle-btn');
-            
+
             if (notesDrawer && !notesDrawer.contains(e.target) && !notesBtn) {
                 const isDesktop = window.innerWidth >= 768;
                 const isOpen = isDesktop ? notesDrawer.classList.contains('notes-desktop-shown') : notesDrawer.classList.contains('notes-mobile-shown');
-                if(isOpen) {
+                if (isOpen) {
                     history.back();
                 }
             }
@@ -731,9 +877,9 @@
             const bmDrawer = document.getElementById('bookmarks-drawer');
             const bmBtn = e.target.closest('#bookmarks-toggle-btn');
             const isOpen = !bmDrawer.classList.contains('translate-x-full');
-            
+
             if (isOpen && bmDrawer && !bmDrawer.contains(e.target) && !bmBtn) {
-                history.back(); 
+                history.back();
             }
         }
 
@@ -747,7 +893,7 @@
 
         // --- Input Modal Functions ---
         function openInputModal(mode, type, index = null) {
-            history.pushState({ui: 'input'}, '', '#input');
+            history.pushState({ ui: 'input' }, '', '#input');
             inputModalState = { mode, type, index };
             const modal = document.getElementById('input-modal');
             const titleEl = document.getElementById('modal-title');
@@ -773,14 +919,14 @@
 
             modal.classList.remove('hidden');
             urlEl.focus();
-            
+
             document.querySelectorAll('.dropdown-content').forEach(el => el.classList.remove('active'));
         }
 
         function closeInputModal() {
             document.getElementById('input-modal').classList.add('hidden');
         }
-        
+
         function closeInputModalWrapper() {
             history.back();
         }
@@ -799,13 +945,13 @@
                     const hostname = new URL(url.startsWith('http') ? url : 'https://' + url).hostname;
                     name = hostname.replace('www.', '').split('.')[0];
                     name = name.charAt(0).toUpperCase() + name.slice(1);
-                } catch(e) { name = "Link"; }
+                } catch (e) { name = "Link"; }
             }
 
             const fullUrl = url.startsWith('http') ? url : 'https://' + url;
-            let icon = "ph-globe"; 
-            if(inputModalState.type === 'chatbots') icon = "ph-magic-wand";
-            if(inputModalState.type === 'social') icon = "ph-share-network";
+            let icon = "ph-globe";
+            if (inputModalState.type === 'chatbots') icon = "ph-magic-wand";
+            if (inputModalState.type === 'social') icon = "ph-share-network";
 
             const newItem = { name: name, url: fullUrl, icon: icon };
 
@@ -829,7 +975,7 @@
             if (mode === 'add') {
                 targetList.push(newItem);
             } else if (mode === 'edit' && index !== null) {
-                if(type !== 'shortcuts') {
+                if (type !== 'shortcuts') {
                     newItem.icon = targetList[index].icon;
                 }
                 targetList[index] = newItem;
@@ -841,22 +987,22 @@
             else if (type === 'chatbots') renderLinks('chatbots-list', chatbots, 'chatbots');
             else if (type === 'shortcuts') renderBottomShortcuts();
 
-            history.back(); 
+            history.back();
         }
 
 
         // --- 4. Notes & Bookmarks Logic ---
         function toggleNotes(e) {
-            if(e) e.stopPropagation();
+            if (e) e.stopPropagation();
             const drawer = document.getElementById('notes-drawer');
             const isDesktop = window.innerWidth >= 768;
-            
+
             const isOpen = isDesktop ? drawer.classList.contains('notes-desktop-shown') : drawer.classList.contains('notes-mobile-shown');
 
             if (isOpen) {
                 history.back();
             } else {
-                history.pushState({ui: 'notes'}, '', '#notes');
+                history.pushState({ ui: 'notes' }, '', '#notes');
                 if (isDesktop) {
                     drawer.classList.remove('notes-desktop-hidden');
                     drawer.classList.add('notes-desktop-shown');
@@ -870,31 +1016,31 @@
                 }
             }
         }
-        
+
         function closeNotes() {
             history.back();
         }
 
         function toggleBookmarks(e) {
-            if(e) e.stopPropagation();
+            if (e) e.stopPropagation();
             const drawer = document.getElementById('bookmarks-drawer');
             const isOpen = !drawer.classList.contains('translate-x-full');
-            
-            if(isOpen) {
+
+            if (isOpen) {
                 history.back();
             } else {
-                history.pushState({ui: 'bookmarks'}, '', '#bookmarks');
+                history.pushState({ ui: 'bookmarks' }, '', '#bookmarks');
                 drawer.classList.remove('translate-x-full');
             }
         }
-        
+
         function closeBookmarks() {
             history.back();
         }
 
         // --- 6. Search Engine Logic ---
         function toggleEngineMenu(e) {
-            if(e) e.stopPropagation();
+            if (e) e.stopPropagation();
             const menu = document.getElementById('engine-menu');
             if (menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
@@ -940,14 +1086,20 @@
                 menu.appendChild(div);
             });
         }
-        
+
         renderEngineOptions();
 
         function handleSearch(e) {
-            e.preventDefault();
+            if (e && typeof e.preventDefault === 'function') {
+                e.preventDefault();
+            }
             const input = document.getElementById('search-input');
+            if (!input) return;
             const query = input.value.trim();
             if (query) {
+                if (!searchEngines[currentEngine]) {
+                    currentEngine = 'google';
+                }
                 searchHistory.unshift(query);
                 if (searchHistory.length > 10) searchHistory.pop();
                 localStorage.setItem('dash_history', JSON.stringify(searchHistory));
@@ -994,24 +1146,24 @@
             e.stopPropagation();
             currentLinkType = type;
             currentLinkIndex = index;
-            
+
             const menu = document.getElementById('link-context-menu');
             menu.style.display = 'flex';
-            
+
             let left = e.pageX;
             let top = e.pageY;
-            
+
             if (left + 150 > window.innerWidth) {
-                left = window.innerWidth - 160; 
+                left = window.innerWidth - 160;
             }
-            
+
             if (top + 100 > window.innerHeight) {
                 top = window.innerHeight - 110;
             }
 
             menu.style.left = `${left}px`;
             menu.style.top = `${top}px`;
-            
+
             document.getElementById('calendar-context-menu').style.display = 'none';
         }
 
@@ -1026,14 +1178,14 @@
             hideContextMenus();
             if (currentLinkType && currentLinkIndex !== null) {
                 let targetList, storageKey;
-                
-                if(currentLinkType === 'social') {
+
+                if (currentLinkType === 'social') {
                     targetList = socials;
                     storageKey = 'dash_socials';
-                } else if(currentLinkType === 'chatbots') {
+                } else if (currentLinkType === 'chatbots') {
                     targetList = chatbots;
                     storageKey = 'dash_chatbots';
-                } else if(currentLinkType === 'shortcuts') {
+                } else if (currentLinkType === 'shortcuts') {
                     targetList = bottomShortcuts;
                     storageKey = 'dash_bottom_shortcuts';
                 }
@@ -1041,10 +1193,10 @@
                 if (confirm("Are you sure you want to delete this link?")) {
                     targetList.splice(currentLinkIndex, 1);
                     localStorage.setItem(storageKey, JSON.stringify(targetList));
-                    
-                    if(currentLinkType === 'social') renderLinks('social-list', socials, 'social');
-                    else if(currentLinkType === 'chatbots') renderLinks('chatbots-list', chatbots, 'chatbots');
-                    else if(currentLinkType === 'shortcuts') renderBottomShortcuts();
+
+                    if (currentLinkType === 'social') renderLinks('social-list', socials, 'social');
+                    else if (currentLinkType === 'chatbots') renderLinks('chatbots-list', chatbots, 'chatbots');
+                    else if (currentLinkType === 'shortcuts') renderBottomShortcuts();
                 }
             }
         }
@@ -1052,16 +1204,16 @@
         // Render Bottom Shortcuts Grid (Favicons)
         function renderBottomShortcuts() {
             const containers = document.querySelectorAll('.shortcuts-grid-container');
-            
+
             containers.forEach(container => {
                 container.innerHTML = '';
-                
+
                 bottomShortcuts.forEach((item, index) => {
                     const a = document.createElement('a');
                     a.href = item.url;
                     a.target = openNewTab ? "_blank" : "_self";
                     a.draggable = true;
-                    a.className = "flex flex-col items-center gap-1 group w-12 cursor-grab active:cursor-grabbing relative select-none touch-none"; 
+                    a.className = "flex flex-col items-center gap-1 group w-12 cursor-grab active:cursor-grabbing relative select-none touch-none";
                     a.setAttribute('data-index', index);
 
                     a.innerHTML = `
@@ -1070,7 +1222,7 @@
                         </div>
                         <span class="text-[10px] text-neutral-600 group-hover:text-[var(--theme-color)] transition-colors truncate w-full text-center pointer-events-none">${item.name}</span>
                     `;
-                    
+
                     a.onclick = (e) => {
                         if (a.getAttribute('data-dragged') === 'true') {
                             e.preventDefault();
@@ -1088,7 +1240,7 @@
                         e.dataTransfer.effectAllowed = 'move';
                         a.style.opacity = '0.4';
                     };
-                    
+
                     a.ondragend = (e) => {
                         a.style.opacity = '1';
                         dragSrcIndex = null;
@@ -1096,7 +1248,7 @@
                     };
 
                     a.ondragover = (e) => {
-                        if (e.preventDefault) e.preventDefault(); 
+                        if (e.preventDefault) e.preventDefault();
                         e.dataTransfer.dropEffect = 'move';
                         return false;
                     };
@@ -1115,14 +1267,14 @@
                     let touchStartX = 0;
                     let touchStartY = 0;
                     let isDragging = false;
-                    
+
                     a.addEventListener('touchstart', (e) => {
                         touchStartX = e.touches[0].clientX;
                         touchStartY = e.touches[0].clientY;
                         isDragging = false;
                         a.setAttribute('data-dragged', 'false');
-                        a.style.transition = 'none'; 
-                    }, {passive: false});
+                        a.style.transition = 'none';
+                    }, { passive: false });
 
                     a.addEventListener('touchmove', (e) => {
                         const touch = e.touches[0];
@@ -1132,19 +1284,19 @@
                         if (deltaX > 10 || deltaY > 10) {
                             isDragging = true;
                             a.setAttribute('data-dragged', 'true');
-                            e.preventDefault(); 
+                            e.preventDefault();
 
                             a.style.opacity = '0.5';
                             a.style.transform = `translate(${touch.clientX - touchStartX}px, ${touch.clientY - touchStartY}px)`;
                             a.style.zIndex = '50';
-                            
+
                             const prevDisplay = a.style.display;
                             a.style.display = 'none';
                             const target = document.elementFromPoint(touch.clientX, touch.clientY);
                             a.style.display = prevDisplay;
 
                             const targetLink = target ? target.closest('a') : null;
-                            
+
                             container.querySelectorAll('a').forEach(el => el.classList.remove('ring-2', 'ring-[var(--theme-color)]', 'rounded-lg'));
 
                             if (targetLink && targetLink !== a && targetLink.parentElement === container) {
@@ -1154,13 +1306,13 @@
                                 a.removeAttribute('data-potential-drop');
                             }
                         }
-                    }, {passive: false});
+                    }, { passive: false });
 
                     a.addEventListener('touchend', (e) => {
                         a.style.opacity = '1';
                         a.style.transform = 'none';
                         a.style.zIndex = 'auto';
-                        
+
                         container.querySelectorAll('a').forEach(el => el.classList.remove('ring-2', 'ring-[var(--theme-color)]', 'rounded-lg'));
 
                         if (isDragging) {
@@ -1168,28 +1320,28 @@
                             if (dropIndex !== null) {
                                 const fromIndex = parseInt(a.getAttribute('data-index'));
                                 const toIndex = parseInt(dropIndex);
-                                
+
                                 if (!isNaN(fromIndex) && !isNaN(toIndex) && fromIndex !== toIndex) {
                                     const [movedItem] = bottomShortcuts.splice(fromIndex, 1);
                                     bottomShortcuts.splice(toIndex, 0, movedItem);
                                     localStorage.setItem('dash_bottom_shortcuts', JSON.stringify(bottomShortcuts));
-                                    renderBottomShortcuts(); 
+                                    renderBottomShortcuts();
                                 }
                             }
                             if (e.cancelable) e.preventDefault();
                         }
-                        
+
                         isDragging = false;
                     });
-                    
+
                     container.appendChild(a);
                 });
             });
-            
+
             const createAddBtn = () => {
                 const btn = document.createElement('button');
                 btn.onclick = () => openInputModal('add', 'shortcuts');
-                btn.className = "flex flex-col items-center gap-1 group w-12"; 
+                btn.className = "flex flex-col items-center gap-1 group w-12";
                 btn.innerHTML = `
                     <div class="w-10 h-10 flex items-center justify-center rounded-lg border border-neutral-800 text-neutral-600 hover:text-[var(--theme-color)] hover:border-neutral-600 transition-all">
                         <i class="ph-plus text-lg"></i>
@@ -1211,7 +1363,7 @@
                 container.innerHTML = '<span class="text-xs text-neutral-600 italic text-center py-2">No recent searches</span>';
                 return;
             }
-            searchHistory.slice(0, 5).forEach(term => { 
+            searchHistory.slice(0, 5).forEach(term => {
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center text-xs text-neutral-400 p-2 rounded hover:bg-white/5 hover:text-[var(--theme-color)] cursor-pointer transition-colors group-hist";
                 div.setAttribute('tabindex', '0');
@@ -1237,7 +1389,7 @@
         function renderBookmarks() {
             const container = document.getElementById('bookmarks-list');
             container.innerHTML = '';
-            if(bookmarks.length === 0) {
+            if (bookmarks.length === 0) {
                 container.innerHTML = '<span class="text-xs text-neutral-600 italic text-center mt-10">No bookmarks saved</span>';
             }
             bookmarks.forEach((bm, index) => {
@@ -1269,13 +1421,13 @@
 
             if (url) {
                 if (!url.startsWith('http')) url = 'https://' + url;
-                
+
                 if (!title) {
                     try {
                         const hostname = new URL(url).hostname;
                         title = hostname.replace('www.', '').split('.')[0];
                         title = title.charAt(0).toUpperCase() + title.slice(1);
-                    } catch(e) {
+                    } catch (e) {
                         title = "Bookmark";
                     }
                 }
@@ -1287,7 +1439,7 @@
                 urlInput.value = '';
             }
         }
-        
+
         function triggerBookmarkImport() {
             document.getElementById('bookmark-import-file').click();
         }
@@ -1297,7 +1449,7 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 try {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(e.target.result, "text/html");
@@ -1306,27 +1458,27 @@
                     links.forEach(a => {
                         const title = a.textContent.trim() || "Bookmark";
                         const url = a.href;
-                        if(url && (url.startsWith('http://') || url.startsWith('https://'))) { 
-                             bookmarks.push({ title, url });
-                             count++;
+                        if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                            bookmarks.push({ title, url });
+                            count++;
                         }
                     });
-                    
+
                     if (count > 0) {
                         localStorage.setItem('dash_bookmarks', JSON.stringify(bookmarks));
                         renderBookmarks();
                         alert(`Successfully imported ${count} bookmarks.`);
                     } else {
-                         alert("No bookmarks found in the file.");
+                        alert("No bookmarks found in the file.");
                     }
-                    
+
                 } catch (err) {
                     alert("Failed to parse bookmark file.");
                     console.error(err);
                 }
             };
             reader.readAsText(file);
-            input.value = ''; 
+            input.value = '';
         }
 
         function removeBookmark(index) {
@@ -1346,11 +1498,11 @@
             const modal = document.getElementById('edit-modal');
             const isHidden = modal.classList.contains('hidden');
             if (isHidden) {
-                history.pushState({ui: 'edit'}, '', '#edit');
+                history.pushState({ ui: 'edit' }, '', '#edit');
                 document.getElementById('theme-color-picker').value = localStorage.getItem('dash_theme_color') || '#ffffff';
                 document.getElementById('edit-social').value = JSON.stringify(socials, null, 2);
                 document.getElementById('edit-chatbots').value = JSON.stringify(chatbots, null, 2);
-                
+
                 // Initialize link behavior settings
                 const newTabCb = document.getElementById('setting-open-new-tab');
                 const bgCb = document.getElementById('setting-open-background');
@@ -1369,7 +1521,7 @@
                 history.back();
             }
         }
-        
+
         function closeEditMode() {
             history.back();
         }
@@ -1379,27 +1531,27 @@
                 const newSocials = JSON.parse(document.getElementById('edit-social').value);
                 const newChatbots = JSON.parse(document.getElementById('edit-chatbots').value);
                 const newTheme = document.getElementById('theme-color-picker').value;
-                
+
                 socials = newSocials;
                 chatbots = newChatbots;
                 savedThemeColor = newTheme;
-                
+
                 localStorage.setItem('dash_socials', JSON.stringify(socials));
                 localStorage.setItem('dash_chatbots', JSON.stringify(chatbots));
                 localStorage.setItem('dash_theme_color', savedThemeColor);
-                
+
                 renderLinks('social-list', socials, 'social');
                 renderLinks('chatbots-list', chatbots, 'chatbots');
                 previewTheme(savedThemeColor);
-                
-                history.back(); 
+
+                history.back();
             } catch (e) {
                 alert("Invalid JSON format. Please check your syntax.");
             }
         }
 
         function resetSection(type) {
-            if(confirm(`Reset ${type} links to default?`)) {
+            if (confirm(`Reset ${type} links to default?`)) {
                 if (type === 'social') {
                     socials = defaultSocials;
                     document.getElementById('edit-social').value = JSON.stringify(socials, null, 2);
@@ -1415,14 +1567,14 @@
 
         function renderCalendarGrid(containerId, isLarge = false, year, month) {
             const grid = document.getElementById(containerId);
-            
+
             const now = new Date();
-            if(year === undefined) year = now.getFullYear();
-            if(month === undefined) month = now.getMonth();
-            
+            if (year === undefined) year = now.getFullYear();
+            if (month === undefined) month = now.getMonth();
+
             const displayDateObj = new Date(year, month, 1);
 
-            if(isLarge) {
+            if (isLarge) {
                 document.getElementById('cal-month-lg').innerText = displayDateObj.toLocaleString('default', { month: 'long' });
                 document.getElementById('cal-year-lg').innerText = year;
             } else {
@@ -1434,8 +1586,8 @@
             const firstDay = new Date(year, month, 1).getDay();
 
             grid.innerHTML = '';
-            
-            ['S','M','T','W','T','F','S'].forEach(d => {
+
+            ['S', 'M', 'T', 'W', 'T', 'F', 'S'].forEach(d => {
                 const span = document.createElement('div');
                 span.className = isLarge ? "text-neutral-600 font-bold mb-2 text-sm" : "text-neutral-600 font-bold mb-1";
                 span.innerText = d;
@@ -1454,13 +1606,13 @@
                 const div = document.createElement('div');
                 const dateKey = `${year}-${month}-${i}`;
                 const data = calendarData[dateKey] || { color: '', note: '' };
-                
+
                 let classes = `rounded-sm transition-colors cursor-default ${isLarge ? 'p-2 md:p-4 text-sm md:text-lg cal-date-large relative' : 'p-1 text-[10px]'}`;
-                
+
                 let style = '';
-                if(data.color) {
+                if (data.color) {
                     style = `color: ${data.color}; font-weight: bold;`;
-                } else if(isCurrentMonth && i === todayDate) {
+                } else if (isCurrentMonth && i === todayDate) {
                     classes += ' bg-[var(--theme-color)] text-black font-bold';
                 } else {
                     classes += ' hover:bg-neutral-800';
@@ -1470,7 +1622,7 @@
                 div.style = style;
                 div.innerText = i;
 
-                if(isLarge) {
+                if (isLarge) {
                     div.setAttribute('tabindex', '0');
                     div.setAttribute('role', 'gridcell');
                     div.oncontextmenu = (e) => openContextMenu(e, dateKey);
@@ -1480,7 +1632,7 @@
                             openContextMenu(e, dateKey);
                         }
                     };
-                    if(data.note) {
+                    if (data.note) {
                         const tooltip = document.createElement('div');
                         tooltip.className = 'cal-tooltip';
                         tooltip.innerText = data.note;
@@ -1499,7 +1651,7 @@
         }
 
         function expandCalendar() {
-            history.pushState({ui: 'calendar'}, '', '#calendar');
+            history.pushState({ ui: 'calendar' }, '', '#calendar');
             document.getElementById('calendar-modal').classList.remove('hidden');
             displayDate = new Date();
             renderCalendarGrid('calendar-grid-lg', true, displayDate.getFullYear(), displayDate.getMonth());
@@ -1519,15 +1671,15 @@
             selectedDateKey = dateKey;
             const menu = document.getElementById('calendar-context-menu');
             const data = calendarData[dateKey] || { color: '#ffffff', note: '' };
-            
+
             document.getElementById('ctx-color').value = data.color || '#ffffff';
             document.getElementById('ctx-note').value = data.note || '';
-            
+
             menu.style.display = 'flex';
-            
+
             let left = e.pageX;
             let top = e.pageY;
-            
+
             if (left + 200 > window.innerWidth) {
                 left = window.innerWidth - 210;
             }
@@ -1537,7 +1689,7 @@
 
             menu.style.left = `${left}px`;
             menu.style.top = `${top}px`;
-            
+
             document.getElementById('link-context-menu').style.display = 'none';
         }
 
@@ -1547,27 +1699,27 @@
         }
 
         function saveDateData() {
-            if(selectedDateKey) {
+            if (selectedDateKey) {
                 const color = document.getElementById('ctx-color').value;
                 const note = document.getElementById('ctx-note').value;
-                if(color === '#000000' && !note) {
+                if (color === '#000000' && !note) {
                     delete calendarData[selectedDateKey];
                 } else {
                     calendarData[selectedDateKey] = { color, note };
                 }
                 localStorage.setItem('dash_calendar_data', JSON.stringify(calendarData));
                 renderCalendarGrid('calendar-grid-lg', true, displayDate.getFullYear(), displayDate.getMonth());
-                generateCalendar(); 
+                generateCalendar();
                 hideContextMenus();
             }
         }
 
         function clearDateData() {
-            if(selectedDateKey) {
+            if (selectedDateKey) {
                 delete calendarData[selectedDateKey];
                 localStorage.setItem('dash_calendar_data', JSON.stringify(calendarData));
                 renderCalendarGrid('calendar-grid-lg', true, displayDate.getFullYear(), displayDate.getMonth());
-                generateCalendar(); 
+                generateCalendar();
                 hideContextMenus();
             }
         }
@@ -1578,7 +1730,7 @@
             const ctx = canvas.getContext('2d');
             let width, height;
             let particles = [];
-            
+
             function resize() {
                 if (canvas.parentElement.offsetWidth > 0) {
                     width = canvas.parentElement.offsetWidth;
@@ -1589,7 +1741,7 @@
                 }
             }
             window.addEventListener('resize', resize);
-            
+
             let mouse = { x: null, y: null };
             document.addEventListener('mousemove', (e) => {
                 const rect = canvas.getBoundingClientRect();
@@ -1614,7 +1766,7 @@
                     if (mouse.x != null) {
                         let dx = mouse.x - this.x;
                         let dy = mouse.y - this.y;
-                        let distance = Math.sqrt(dx*dx + dy*dy);
+                        let distance = Math.sqrt(dx * dx + dy * dy);
                         if (distance < 100) {
                             this.x += dx * 0.02;
                             this.y += dy * 0.02;
@@ -1645,9 +1797,9 @@
                     for (let j = i; j < particles.length; j++) {
                         let dx = particles[i].x - particles[j].x;
                         let dy = particles[i].y - particles[j].y;
-                        let distance = Math.sqrt(dx*dx + dy*dy);
+                        let distance = Math.sqrt(dx * dx + dy * dy);
                         if (distance < 80) {
-                            ctx.strokeStyle = `rgba(${themeRgb.r}, ${themeRgb.g}, ${themeRgb.b}, ${1 - distance/80})`;
+                            ctx.strokeStyle = `rgba(${themeRgb.r}, ${themeRgb.g}, ${themeRgb.b}, ${1 - distance / 80})`;
                             ctx.lineWidth = 0.5;
                             ctx.beginPath();
                             ctx.moveTo(particles[i].x, particles[i].y);
@@ -1704,7 +1856,7 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 try {
                     const data = JSON.parse(e.target.result);
                     // Validate basic structure if needed, for now trust the user
@@ -1725,25 +1877,25 @@
             };
             reader.readAsText(file);
             // Reset input so same file can be selected again
-            input.value = ''; 
+            input.value = '';
         }
 
         // --- 12. Robust Connection Logic ---
         const statusEl = document.getElementById('connection-status');
         const systemStatusText = document.getElementById('system-status-text');
-        
-        let lastKnownState = null; 
+
+        let lastKnownState = null;
 
         // Active Check: Pings a reliable source (Google Favicon) to verify internet
         async function checkConnectivity() {
             if (!navigator.onLine) return false; // Browser knows we are offline
-            
+
             try {
                 // Try to fetch a tiny resource. 'no-cors' mode is enough to check network reachability.
                 // We add a timestamp to prevent caching.
-                await fetch('https://www.google.com/favicon.ico?' + new Date().getTime(), { 
-                    mode: 'no-cors', 
-                    cache: 'no-store' 
+                await fetch('https://www.google.com/favicon.ico?' + new Date().getTime(), {
+                    mode: 'no-cors',
+                    cache: 'no-store'
                 });
                 return true;
             } catch (e) {
@@ -1771,7 +1923,7 @@
                     </div>
                 `;
                 statusEl.classList.remove('opacity-0');
-                
+
                 // Footer Text: Urgent Red
                 if (systemStatusText) {
                     systemStatusText.textContent = "System Offline";
@@ -1781,7 +1933,7 @@
             } else {
                 // --- ONLINE STATE ---
                 // Only flash green if we were previously offline (or null/loading)
-                if (previousState === false) { 
+                if (previousState === false) {
                     statusEl.innerHTML = `
                         <div class="px-4 py-1.5 rounded-full border border-green-900/60 bg-green-950/80 text-green-400 text-[10px] uppercase tracking-[0.2em] font-semibold flex items-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.3)] backdrop-blur-md">
                             <i class="ph-wifi-high text-sm"></i>
@@ -1870,7 +2022,7 @@
                 if (el.closest('#networkCanvas') || el.closest('a[href*="github.com/Delta-R-git"]')) return false;
                 const style = window.getComputedStyle(el);
                 if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
-                
+
                 // Exclude elements inside closed drawers or hidden modals
                 if (el.closest('#edit-modal.hidden') || el.closest('#calendar-modal.hidden') || el.closest('#input-modal.hidden')) return false;
                 if (el.closest('#notes-drawer.notes-desktop-hidden.notes-mobile-hidden')) return false;
@@ -2172,4 +2324,5 @@
         }
     </script>
 </body>
+
 </html>
