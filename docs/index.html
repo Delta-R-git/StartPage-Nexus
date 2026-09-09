@@ -78,12 +78,30 @@
             pointer-events: none; /* Prevent clicks when closed */
         }
         
-        /* Show on Active class (Click) OR Group Hover */
+        /* Show on Active class (Click), Group Hover, OR Focus Within */
         .dropdown-content.active,
-        .group:hover .dropdown-content {
+        .group:hover .dropdown-content,
+        .group:focus-within .dropdown-content {
             max-height: 500px;
             opacity: 1;
             pointer-events: auto;
+        }
+
+        /* High visibility visual focus indicator for keyboard navigation (excluding search input) */
+        button:focus-visible,
+        a:focus-visible,
+        [tabindex="0"]:focus-visible {
+            outline: 2px solid var(--theme-color) !important;
+            outline-offset: 2px !important;
+            border-radius: 6px;
+        }
+
+        #search-input,
+        #search-input:focus,
+        #search-input:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            border: none !important;
         }
 
         /* Glassmorphism for modals/overlays */
@@ -186,7 +204,7 @@
                 
                 <!-- Engine Selector -->
                 <div class="relative group cursor-pointer mr-3 border-r border-neutral-800 pr-3" id="engine-selector-container">
-                    <div id="current-engine-icon" onclick="toggleEngineMenu(event)" class="text-neutral-400 hover:text-[var(--theme-color)] transition-colors flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/5">
+                    <div id="current-engine-icon" onclick="toggleEngineMenu(event)" tabindex="0" role="button" aria-label="Select Search Engine" class="text-neutral-400 hover:text-[var(--theme-color)] transition-colors flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/5 focus:outline-none">
                         <i class="ph-google-logo text-xl"></i>
                     </div>
                     <!-- Engine Dropdown -->
@@ -197,13 +215,13 @@
 
                 <!-- Input -->
                 <form id="search-form" class="flex-grow" onsubmit="handleSearch(event)">
-                    <input type="text" id="search-input" 
-                        class="w-full bg-transparent text-lg font-light text-[var(--theme-color)] focus:outline-none placeholder-neutral-600 h-full"
+                    <input type="text" id="search-input" autofocus
+                        class="w-full bg-transparent text-lg font-light text-[var(--theme-color)] focus:outline-none placeholder-neutral-600 h-full border-none ring-0 shadow-none"
                         placeholder="Search..." autocomplete="off">
                 </form>
 
                 <!-- Search Icon -->
-                <button onclick="handleSearch(event)" class="ml-2 text-neutral-500 hover:text-[var(--theme-color)] transition-colors">
+                <button id="search-submit-btn" onclick="handleSearch(event)" aria-label="Submit Search" class="ml-2 text-neutral-500 hover:text-[var(--theme-color)] transition-colors p-1 rounded-full focus:outline-none">
                     <i class="ph-magnifying-glass text-xl"></i>
                 </button>
             </div>
@@ -279,7 +297,7 @@
     <footer class="flex flex-col md:flex-row justify-between items-end gap-4 h-56 fade-in relative px-2 md:px-0" style="animation-delay: 0.5s;">
         
         <!-- 1. Calendar Widget (Left) -->
-        <div class="w-full md:w-64 h-full flex flex-col justify-end cursor-pointer group flex-shrink-0" onclick="expandCalendar()">
+        <div id="calendar-widget-btn" tabindex="0" role="button" aria-label="Expand Calendar" class="w-full md:w-64 h-full flex flex-col justify-end cursor-pointer group flex-shrink-0" onclick="expandCalendar()">
             <div class="glass-panel p-4 rounded-xl border border-neutral-900/50 group-hover:border-neutral-700 transition-colors relative h-full flex flex-col justify-between">
                 <div class="absolute top-2 right-2 text-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity">
                     <i class="ph-arrows-out-simple"></i>
@@ -309,7 +327,7 @@
             <div class="absolute bottom-4 right-4 z-20 pointer-events-auto">
                 <p id="system-status-text" class="text-[10px] text-neutral-600 tracking-widest uppercase transition-colors duration-300">System Online</p>
                 <!-- GitHub / Owner Link -->
-                <a href="https://github.com/Delta-R-git/StartPage-Nexus" target="_blank" class="text-[10px] text-neutral-700 hover:text-[var(--theme-color)] tracking-widest uppercase text-right transition-colors block mt-1 font-semibold">
+                <a href="https://github.com/Delta-R-git/StartPage-Nexus" target="_blank" tabindex="-1" class="text-[10px] text-neutral-700 hover:text-[var(--theme-color)] tracking-widest uppercase text-right transition-colors block mt-1 font-semibold">
                     Delta_R_git
                 </a>
             </div>
@@ -434,7 +452,28 @@
             
             <div class="space-y-6 max-h-[60vh] overflow-y-auto pr-2 custom-scroll">
                 
-                <!-- NEW: Theme & Data Section -->
+                <!-- Link & Search Behavior Section -->
+                <div class="mb-4 pb-4 border-b border-neutral-800 flex flex-col gap-3">
+                    <h4 class="text-xs uppercase text-neutral-500 tracking-wider">Link & Search Behavior</h4>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-neutral-300">Open links in new tab</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="setting-open-new-tab" class="sr-only peer" onchange="updateLinkBehaviorSettings()">
+                            <div class="w-9 h-5 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--theme-color)] peer-checked:after:bg-black"></div>
+                        </label>
+                    </div>
+
+                    <div id="open-background-row" class="flex items-center justify-between">
+                        <span class="text-xs text-neutral-300">Open tab in background</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="setting-open-background" class="sr-only peer" onchange="updateLinkBehaviorSettings()">
+                            <div class="w-9 h-5 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--theme-color)] peer-checked:after:bg-black"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Theme & Data Section -->
                 <div class="mb-4 pb-4 border-b border-neutral-800 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
                          <h4 class="text-xs uppercase text-neutral-500 tracking-wider">Theme & Data</h4>
@@ -528,6 +567,51 @@
         let calendarData = JSON.parse(localStorage.getItem('dash_calendar_data')) || {};
         let currentEngine = localStorage.getItem('dash_engine') || 'google';
         
+        // Link Behavior Settings
+        let openNewTab = JSON.parse(localStorage.getItem('dash_open_new_tab') ?? 'true');
+        let openInBackground = JSON.parse(localStorage.getItem('dash_open_background') ?? 'false');
+
+        function openUrl(url) {
+            if (!url) return;
+            if (!openNewTab) {
+                window.location.href = url;
+                return;
+            }
+
+            const win = window.open(url, '_blank', 'noopener');
+            if (openInBackground && win) {
+                try { win.blur(); } catch (e) {}
+                window.focus();
+                setTimeout(() => { window.focus(); }, 0);
+                setTimeout(() => { window.focus(); }, 50);
+                setTimeout(() => { window.focus(); }, 150);
+            }
+        }
+
+        function updateLinkBehaviorSettings() {
+            const newTabCb = document.getElementById('setting-open-new-tab');
+            const bgCb = document.getElementById('setting-open-background');
+            const bgRow = document.getElementById('open-background-row');
+
+            if (newTabCb && bgCb) {
+                openNewTab = newTabCb.checked;
+                openInBackground = bgCb.checked;
+
+                localStorage.setItem('dash_open_new_tab', JSON.stringify(openNewTab));
+                localStorage.setItem('dash_open_background', JSON.stringify(openInBackground));
+
+                if (bgRow) {
+                    bgRow.style.opacity = openNewTab ? '1' : '0.4';
+                    bgCb.disabled = !openNewTab;
+                }
+
+                renderLinks('social-list', socials, 'social');
+                renderLinks('chatbots-list', chatbots, 'chatbots');
+                renderBottomShortcuts();
+                renderBookmarks();
+            }
+        }
+
         // Theme color
         let savedThemeColor = localStorage.getItem('dash_theme_color') || '#ffffff';
         document.documentElement.style.setProperty('--theme-color', savedThemeColor);
@@ -839,7 +923,16 @@
                 const eng = searchEngines[key];
                 const div = document.createElement('div');
                 div.className = `flex items-center gap-3 p-3 rounded cursor-pointer transition-colors ${currentEngine === key ? 'bg-white text-black' : 'text-neutral-400 hover:text-[var(--theme-color)] hover:bg-white/10'}`;
+                div.setAttribute('tabindex', '0');
+                div.setAttribute('role', 'button');
                 div.onclick = (e) => { e.stopPropagation(); setEngine(key); };
+                div.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setEngine(key);
+                    }
+                };
                 div.innerHTML = `
                     <i class="${eng.icon} text-lg"></i>
                     <span class="text-xs font-medium">${eng.name}</span>
@@ -860,7 +953,7 @@
                 localStorage.setItem('dash_history', JSON.stringify(searchHistory));
                 renderHistory();
                 const engineUrl = searchEngines[currentEngine].url;
-                window.open(`${engineUrl}${encodeURIComponent(query)}`, '_blank');
+                openUrl(`${engineUrl}${encodeURIComponent(query)}`);
                 input.value = '';
                 input.blur();
             }
@@ -879,12 +972,18 @@
             items.forEach((item, index) => {
                 const a = document.createElement('a');
                 a.href = item.url;
-                a.target = "_blank"; 
+                a.target = openNewTab ? "_blank" : "_self";
                 a.className = "flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors text-sm text-neutral-300 hover:text-[var(--theme-color)] group-link";
                 a.innerHTML = `
                     <i class="${item.icon || 'ph-link'} text-lg text-neutral-500 group-link-hover:text-[var(--theme-color)] transition-colors"></i>
                     <span>${item.name}</span>
                 `;
+                a.onclick = (e) => {
+                    if (openNewTab && openInBackground) {
+                        e.preventDefault();
+                        openUrl(item.url);
+                    }
+                };
                 a.oncontextmenu = (e) => openLinkContextMenu(e, type, index);
                 container.appendChild(a);
             });
@@ -960,7 +1059,7 @@
                 bottomShortcuts.forEach((item, index) => {
                     const a = document.createElement('a');
                     a.href = item.url;
-                    a.target = "_blank";
+                    a.target = openNewTab ? "_blank" : "_self";
                     a.draggable = true;
                     a.className = "flex flex-col items-center gap-1 group w-12 cursor-grab active:cursor-grabbing relative select-none touch-none"; 
                     a.setAttribute('data-index', index);
@@ -972,6 +1071,16 @@
                         <span class="text-[10px] text-neutral-600 group-hover:text-[var(--theme-color)] transition-colors truncate w-full text-center pointer-events-none">${item.name}</span>
                     `;
                     
+                    a.onclick = (e) => {
+                        if (a.getAttribute('data-dragged') === 'true') {
+                            e.preventDefault();
+                            return;
+                        }
+                        if (openNewTab && openInBackground) {
+                            e.preventDefault();
+                            openUrl(item.url);
+                        }
+                    };
                     a.oncontextmenu = (e) => openLinkContextMenu(e, 'shortcuts', index);
 
                     a.ondragstart = (e) => {
@@ -1105,8 +1214,16 @@
             searchHistory.slice(0, 5).forEach(term => { 
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center text-xs text-neutral-400 p-2 rounded hover:bg-white/5 hover:text-[var(--theme-color)] cursor-pointer transition-colors group-hist";
+                div.setAttribute('tabindex', '0');
+                div.setAttribute('role', 'button');
                 div.innerHTML = `<span class="truncate pr-2">${term}</span> <i class="ph-arrow-square-out opacity-0 group-hist-hover:opacity-100 transition-opacity"></i>`;
-                div.onclick = () => window.open(`${searchEngines[currentEngine].url}${encodeURIComponent(term)}`, '_blank');
+                div.onclick = () => openUrl(`${searchEngines[currentEngine].url}${encodeURIComponent(term)}`);
+                div.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openUrl(`${searchEngines[currentEngine].url}${encodeURIComponent(term)}`);
+                    }
+                };
                 container.appendChild(div);
             });
         }
@@ -1127,12 +1244,19 @@
                 const div = document.createElement('div');
                 div.className = "flex items-center justify-between bg-neutral-900/50 border border-neutral-800 rounded p-3 hover:border-neutral-600 transition-colors group";
                 div.innerHTML = `
-                    <a href="${bm.url}" target="_blank" class="flex-grow text-xs text-neutral-300 hover:text-[var(--theme-color)] truncate pr-2 flex items-center gap-2">
+                    <a href="${bm.url}" target="${openNewTab ? '_blank' : '_self'}" class="flex-grow text-xs text-neutral-300 hover:text-[var(--theme-color)] truncate pr-2 flex items-center gap-2">
                         <img src="https://www.google.com/s2/favicons?domain=${bm.url}&sz=16" class="w-4 h-4 opacity-70" onerror="this.style.display='none'">
                         ${bm.title}
                     </a>
                     <button onclick="removeBookmark(${index})" class="text-neutral-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><i class="ph-trash"></i></button>
                 `;
+                const a = div.querySelector('a');
+                a.onclick = (e) => {
+                    if (openNewTab && openInBackground) {
+                        e.preventDefault();
+                        openUrl(bm.url);
+                    }
+                };
                 container.appendChild(div);
             });
         }
@@ -1226,6 +1350,20 @@
                 document.getElementById('theme-color-picker').value = localStorage.getItem('dash_theme_color') || '#ffffff';
                 document.getElementById('edit-social').value = JSON.stringify(socials, null, 2);
                 document.getElementById('edit-chatbots').value = JSON.stringify(chatbots, null, 2);
+                
+                // Initialize link behavior settings
+                const newTabCb = document.getElementById('setting-open-new-tab');
+                const bgCb = document.getElementById('setting-open-background');
+                const bgRow = document.getElementById('open-background-row');
+                if (newTabCb && bgCb) {
+                    newTabCb.checked = openNewTab;
+                    bgCb.checked = openInBackground;
+                    if (bgRow) {
+                        bgRow.style.opacity = openNewTab ? '1' : '0.4';
+                        bgCb.disabled = !openNewTab;
+                    }
+                }
+
                 modal.classList.remove('hidden');
             } else {
                 history.back();
@@ -1333,7 +1471,15 @@
                 div.innerText = i;
 
                 if(isLarge) {
+                    div.setAttribute('tabindex', '0');
+                    div.setAttribute('role', 'gridcell');
                     div.oncontextmenu = (e) => openContextMenu(e, dateKey);
+                    div.onkeydown = (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            openContextMenu(e, dateKey);
+                        }
+                    };
                     if(data.note) {
                         const tooltip = document.createElement('div');
                         tooltip.className = 'cal-tooltip';
@@ -1520,7 +1666,8 @@
             const keys = [
                 'dash_socials', 'dash_chatbots', 'dash_bottom_shortcuts',
                 'dash_bookmarks', 'dash_history', 'dash_calendar_data',
-                'dash_engine', 'dash_notes', 'dash_theme_color'
+                'dash_engine', 'dash_notes', 'dash_theme_color',
+                'dash_open_new_tab', 'dash_open_background'
             ];
             const data = {};
             keys.forEach(key => {
@@ -1681,6 +1828,348 @@
         generateCalendar();
         initNetworkVisualizer();
 
+        // --- 13. Auto-Focus Search & Spatial Keyboard Navigation ---
+        function closeEngineMenu() {
+            const menu = document.getElementById('engine-menu');
+            if (menu && !menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+                menu.classList.remove('flex');
+            }
+        }
+
+        document.addEventListener('focusin', (e) => {
+            if (!e.target.closest('#engine-selector-container')) {
+                closeEngineMenu();
+            }
+        });
+
+        function getActiveContainer() {
+            const inputModal = document.getElementById('input-modal');
+            if (inputModal && !inputModal.classList.contains('hidden')) return inputModal;
+
+            const editModal = document.getElementById('edit-modal');
+            if (editModal && !editModal.classList.contains('hidden')) return editModal;
+
+            const calModal = document.getElementById('calendar-modal');
+            if (calModal && !calModal.classList.contains('hidden')) return calModal;
+
+            const notesDrawer = document.getElementById('notes-drawer');
+            if (notesDrawer && (notesDrawer.classList.contains('notes-desktop-shown') || notesDrawer.classList.contains('notes-mobile-shown'))) return notesDrawer;
+
+            const bmDrawer = document.getElementById('bookmarks-drawer');
+            if (bmDrawer && !bmDrawer.classList.contains('translate-x-full')) return bmDrawer;
+
+            return document.body;
+        }
+
+        function getVisibleFocusableElements(container = document.body) {
+            const selector = 'a[href]:not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), [tabindex="0"]:not([tabindex="-1"])';
+            const elements = Array.from(container.querySelectorAll(selector));
+            return elements.filter(el => {
+                if (el.offsetWidth === 0 && el.offsetHeight === 0) return false;
+                if (el.closest('#networkCanvas') || el.closest('a[href*="github.com/Delta-R-git"]')) return false;
+                const style = window.getComputedStyle(el);
+                if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+                
+                // Exclude elements inside closed drawers or hidden modals
+                if (el.closest('#edit-modal.hidden') || el.closest('#calendar-modal.hidden') || el.closest('#input-modal.hidden')) return false;
+                if (el.closest('#notes-drawer.notes-desktop-hidden.notes-mobile-hidden')) return false;
+                if (el.closest('#bookmarks-drawer.translate-x-full')) return false;
+
+                return true;
+            });
+        }
+
+        function getShortcutsCandidates() {
+            const containers = Array.from(document.querySelectorAll('.shortcuts-grid-container'));
+            for (const container of containers) {
+                const style = window.getComputedStyle(container);
+                if (container.offsetWidth > 0 && container.offsetHeight > 0 && style.display !== 'none' && style.visibility !== 'hidden') {
+                    const items = getVisibleFocusableElements(container);
+                    if (items.length > 0) return items;
+                }
+            }
+            return [];
+        }
+
+        function navigateSpatial(direction) {
+            const container = getActiveContainer();
+            const candidates = getVisibleFocusableElements(container);
+            if (!candidates.length) return false;
+
+            const currentEl = document.activeElement;
+            const searchInput = document.getElementById('search-input');
+
+            if (currentEl && (currentEl.id === 'current-engine-icon' || currentEl.closest('#engine-menu'))) {
+                if (direction === 'ArrowUp' || direction === 'ArrowLeft' || direction === 'ArrowRight') {
+                    closeEngineMenu();
+                }
+            }
+
+            if (!currentEl || currentEl === document.body || currentEl === document.documentElement || !container.contains(currentEl)) {
+                if (candidates.includes(searchInput)) {
+                    searchInput.focus();
+                } else if (candidates.length > 0) {
+                    candidates[0].focus();
+                }
+                return true;
+            }
+
+            const isCategoryBtn = currentEl.closest('.menu-container') && currentEl.tagName === 'BUTTON';
+            const isInsideDropdown = currentEl.closest('.dropdown-content');
+
+            if (direction === 'ArrowDown' && (isCategoryBtn || isInsideDropdown)) {
+                const menuContainer = currentEl.closest('.menu-container');
+                const dropdownEl = menuContainer ? menuContainer.querySelector('.dropdown-content') : null;
+                const isDropdownOpen = dropdownEl && (dropdownEl.classList.contains('active') || window.getComputedStyle(dropdownEl).opacity === '1');
+
+                if (isCategoryBtn) {
+                    if (!isDropdownOpen) {
+                        const shortcuts = getShortcutsCandidates();
+                        if (shortcuts.length > 0) {
+                            const cRect = currentEl.getBoundingClientRect();
+                            const cCenterX = cRect.left + cRect.width / 2;
+                            let bestShot = shortcuts[0];
+                            let minDx = Infinity;
+                            shortcuts.forEach(sc => {
+                                const scRect = sc.getBoundingClientRect();
+                                const scCenterX = scRect.left + scRect.width / 2;
+                                const dx = Math.abs(scCenterX - cCenterX);
+                                if (dx < minDx) {
+                                    minDx = dx;
+                                    bestShot = sc;
+                                }
+                            });
+                            bestShot.focus();
+                            return true;
+                        }
+                    }
+                } else if (isInsideDropdown) {
+                    const dropdownFocusables = getVisibleFocusableElements(dropdownEl);
+                    const lastEl = dropdownFocusables[dropdownFocusables.length - 1];
+                    if (currentEl === lastEl) {
+                        document.querySelectorAll('.dropdown-content').forEach(el => el.classList.remove('active'));
+                        const shortcuts = getShortcutsCandidates();
+                        if (shortcuts.length > 0) {
+                            shortcuts[0].focus();
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            const availableCandidates = candidates.filter(el => el !== currentEl);
+            if (!availableCandidates.length) return false;
+
+            const cRect = currentEl.getBoundingClientRect();
+            const cCenter = { x: cRect.left + cRect.width / 2, y: cRect.top + cRect.height / 2 };
+
+            let bestCandidate = null;
+            let minScore = Infinity;
+
+            availableCandidates.forEach(el => {
+                const tRect = el.getBoundingClientRect();
+                const tCenter = { x: tRect.left + tRect.width / 2, y: tRect.top + tRect.height / 2 };
+
+                let dx = tCenter.x - cCenter.x;
+                let dy = tCenter.y - cCenter.y;
+
+                let isHeadingDirection = false;
+                let mainDist = 0;
+                let crossDist = 0;
+
+                if (direction === 'ArrowRight') {
+                    if (tRect.left >= cRect.right - 8 || (dx > 5 && Math.abs(dy) < cRect.height)) {
+                        isHeadingDirection = true;
+                        mainDist = tRect.left - cRect.right;
+                        if (mainDist < 0) mainDist = dx;
+                        crossDist = Math.abs(dy);
+                    }
+                } else if (direction === 'ArrowLeft') {
+                    if (tRect.right <= cRect.left + 8 || (dx < -5 && Math.abs(dy) < cRect.height)) {
+                        isHeadingDirection = true;
+                        mainDist = cRect.left - tRect.right;
+                        if (mainDist < 0) mainDist = -dx;
+                        crossDist = Math.abs(dy);
+                    }
+                } else if (direction === 'ArrowDown') {
+                    if (tRect.top >= cRect.bottom - 8 || (dy > 5 && Math.abs(dx) < cRect.width)) {
+                        isHeadingDirection = true;
+                        mainDist = tRect.top - cRect.bottom;
+                        if (mainDist < 0) mainDist = dy;
+                        crossDist = Math.abs(dx);
+                    }
+                } else if (direction === 'ArrowUp') {
+                    if (tRect.bottom <= cRect.top + 8 || (dy < -5 && Math.abs(dx) < cRect.width)) {
+                        isHeadingDirection = true;
+                        mainDist = cRect.top - tRect.bottom;
+                        if (mainDist < 0) mainDist = -dy;
+                        crossDist = Math.abs(dx);
+                    }
+                }
+
+                if (isHeadingDirection) {
+                    const score = mainDist + crossDist * 2.5;
+                    if (score < minScore) {
+                        minScore = score;
+                        bestCandidate = el;
+                    }
+                }
+            });
+
+            if (!bestCandidate) {
+                availableCandidates.forEach(el => {
+                    const tRect = el.getBoundingClientRect();
+                    const tCenter = { x: tRect.left + tRect.width / 2, y: tRect.top + tRect.height / 2 };
+                    let dx = tCenter.x - cCenter.x;
+                    let dy = tCenter.y - cCenter.y;
+                    let validHalfPlane = false;
+
+                    if (direction === 'ArrowRight' && dx > 5) validHalfPlane = true;
+                    if (direction === 'ArrowLeft' && dx < -5) validHalfPlane = true;
+                    if (direction === 'ArrowDown' && dy > 5) validHalfPlane = true;
+                    if (direction === 'ArrowUp' && dy < -5) validHalfPlane = true;
+
+                    if (validHalfPlane) {
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < minScore) {
+                            minScore = dist;
+                            bestCandidate = el;
+                        }
+                    }
+                });
+            }
+
+            if (bestCandidate) {
+                if (currentEl && currentEl.closest('#engine-menu') && !bestCandidate.closest('#engine-menu')) {
+                    closeEngineMenu();
+                }
+
+                bestCandidate.focus();
+                if (typeof bestCandidate.scrollIntoView === 'function') {
+                    bestCandidate.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        function handleAutoTyping(e) {
+            if (e.ctrlKey || e.altKey || e.metaKey) return;
+            if (e.key === 'Tab' || e.key === 'Escape' || e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || e.key === 'CapsLock' || e.key.startsWith('F')) return;
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+
+            const active = document.activeElement;
+            if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+                return;
+            }
+
+            const activeContainer = getActiveContainer();
+            if (activeContainer !== document.body) return;
+
+            const searchInput = document.getElementById('search-input');
+            if (!searchInput) return;
+
+            if (e.key.length === 1) {
+                searchInput.focus();
+                if (active !== searchInput) {
+                    searchInput.value += e.key;
+                    searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+                    e.preventDefault();
+                }
+            } else if (e.key === 'Backspace') {
+                searchInput.focus();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeEngineMenu();
+                document.querySelectorAll('.dropdown-content').forEach(el => el.classList.remove('active'));
+                hideContextMenus();
+
+                const activeContainer = getActiveContainer();
+                if (activeContainer !== document.body) {
+                    closeAllUI(true);
+                }
+
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) searchInput.focus();
+                return;
+            }
+
+            handleAutoTyping(e);
+
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                if (e.altKey || e.ctrlKey || e.metaKey) return;
+
+                const active = document.activeElement;
+                const searchInput = document.getElementById('search-input');
+
+                if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+                    if (active === searchInput) {
+                        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            navigateSpatial(e.key);
+                            return;
+                        }
+                        if (e.key === 'ArrowLeft' && active.selectionStart === 0 && active.selectionEnd === 0) {
+                            e.preventDefault();
+                            navigateSpatial('ArrowLeft');
+                            return;
+                        }
+                        if (e.key === 'ArrowRight' && active.selectionStart === active.value.length && active.selectionEnd === active.value.length) {
+                            e.preventDefault();
+                            navigateSpatial('ArrowRight');
+                            return;
+                        }
+                        return;
+                    } else if (active.tagName === 'INPUT' && active.type === 'text') {
+                        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            navigateSpatial(e.key);
+                            return;
+                        }
+                        if (e.key === 'ArrowLeft' && active.selectionStart === 0) {
+                            e.preventDefault();
+                            navigateSpatial('ArrowLeft');
+                            return;
+                        }
+                        if (e.key === 'ArrowRight' && active.selectionStart === active.value.length) {
+                            e.preventDefault();
+                            navigateSpatial('ArrowRight');
+                            return;
+                        }
+                        return;
+                    } else if (active.tagName === 'TEXTAREA') {
+                        return;
+                    }
+                }
+
+                const navigated = navigateSpatial(e.key);
+                if (navigated) {
+                    e.preventDefault();
+                }
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                const active = document.activeElement;
+                if (active && (active.getAttribute('tabindex') === '0' || active.getAttribute('role') === 'button')) {
+                    if (active.tagName !== 'BUTTON' && active.tagName !== 'A' && active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        active.click();
+                    }
+                }
+            }
+        });
+
+        // Automatically focus search input when opening page
+        const searchInputEl = document.getElementById('search-input');
+        if (searchInputEl) {
+            setTimeout(() => {
+                searchInputEl.focus();
+            }, 50);
+        }
     </script>
 </body>
 </html>
